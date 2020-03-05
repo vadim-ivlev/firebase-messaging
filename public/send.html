@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send message</title>
+
+    <link rel="stylesheet" href="css/main.css">
+
+    <script src="js/fcm-server-key.js"></script>
+    <script src="js/send-message.js"></script>
+</head>
+<body>
+    <h2>Отправка уведомлений</h2>
+    <b>Тестирование отправки уведомлений</b>. Откройте консоль браузера для просмотра результатов операций.<br><br>
+
+    <label for="txt">Текст уведомления1</label>
+    <input id="txt" type="text"  placeholder="текст сообщения" value="Верховный суд разъяснил, чем угон автомобиля отличается от кражи"/>
+    <label for="link">Ссылка</label>
+    <input id="link" type="text"  placeholder="ссылка" value="https://rg.ru/2020/03/02/verhovnyj-sud-raziasnil-chem-ugon-avtomobilia-otlichaetsia-ot-krazhi.html"/>
+    <br>
+    <br>
+    <br>
+    <br>
+
+
+    Отправить сообщение <b>конкретному пользователю</b> по его токену <br>
+    <input id="to" type="text" value='' placeholder="token" />
+    <button onclick="sendMessage(document.getElementById('to').value, document.getElementById('txt').value, document.getElementById('link').value)">Послать сообщение пользователю</button>
+
+    <br><br>
+
+    Отправить сообщение  пользователям <b>подписанным на топик 'rgru'</b><br>
+    <!-- <input id="topic" type="text"  placeholder="topic name" value='rgru'/> -->
+    <br>
+    <button onclick="sendTopicMessage('rgru', document.getElementById('txt').value, document.getElementById('link').value)">Разослать сообщения по теме 'rgru'</button>
+    <br>
+    <br>
+
+
+    <b>Отправленные уведомления</b><br>
+
+</body>
+</html>
