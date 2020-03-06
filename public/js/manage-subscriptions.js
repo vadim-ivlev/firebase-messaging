@@ -12,11 +12,19 @@ function subscribe(whom, to) {
           'to': '/topics/'+to,
           'registration_tokens': whom
       })
-    }).then(function(response) {
-      console.log(`Subscribed to ${to}`,response);
-    }).catch(function(error) {
-      console.error(`Error subscribing to ${to}`,error);
-    })  
+    })
+    .then(res => res.json())
+    .then(json => console.log(json))
+    .catch(err => console.log("ERROR:",err))
+
+    
+    // .then(function(response) {
+    //   console.log(`Subscribed to ${to}`,response);
+    // }).catch(function(error) {
+    //   console.error(`Error subscribing to ${to}`,error);
+    // })  
+
+
   }
 
 
@@ -32,9 +40,19 @@ function unsubscribe(whom, to) {
         "registration_tokens": whom,
         'to': "/topics/"+to
       })
-    }).then(function(response) {
-      console.log(`Unsubscribed from ${to}`,response);
-    }).catch(function(error) {
-      console.error(`Error unsubscribing from ${to}`,error);
-    })  
+    })
+    .then(res => res.json())
+    .then(json => console.log(json))
+    .catch(err => console.log("ERROR:",err))
+
+    
+    
+    // .then(function(response) {
+    //   console.log(`Unsubscribed from ${to}`,response);
+    // }).catch(function(error) {
+    //   console.error(`Error unsubscribing from ${to}`,error);
+    // })  
+
+
+
   }

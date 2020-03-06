@@ -25,11 +25,11 @@
 
 
     
-    1. Сначала пользователь должен разрешить браузеру получение сообщений. <br><br>
+    1. Запросить разрешение на получение сообщений. <br><br>
     <button onclick="requestPermission()">Запросить разрешение</button> <br><br>    
 
     
-    2. Получить токен браузера, если это не произошло автоматически. <br><br>
+    2. Получить токен браузера. <br><br>
     <button onclick="getCurrentToken()">Получить токен</button>
     <button onclick="deleteToken()" class="button-outline">Удалить токен</button>   
     <div style="display:grid; grid-template-columns: 1fr auto;" >
@@ -42,8 +42,8 @@
 
     
     3. Подписать токен на получение сообщений по теме (топику) 'rgru' <br><br>
-    <button onclick="subscribe([IID_TOKEN],'rgru')">Подписаться на 'rgru'</button>
-    <button onclick="unsubscribe([IID_TOKEN],'rgru')" class="button-outline">Отписаться от 'rgru'</button>
+    <button onclick="subscribe([IID_TOKEN],'rgru')">Подписать токен на 'rgru'</button>
+    <button onclick="unsubscribe([IID_TOKEN],'rgru')" class="button-outline">Отписать токен от 'rgru'</button>
     <!-- <input id="topic" type="text" placeholder="topic" value="rgru"/> -->
     <br>
     <br>
@@ -62,25 +62,13 @@
     <div id="messages"></div>
 
 
-
-    <!-- Import and configure the Firebase SDK -->
-    <!-- These scripts are made available when the app is served or deployed on Firebase Hosting -->
-    <!-- If you do not serve/host your project using Firebase Hosting see https://firebase.google.com/docs/web/setup -->
-
-<!--
-    <script src="/__/firebase/7.9.3/firebase-app.js"></script>
-    <script src="/__/firebase/7.9.3/firebase-messaging.js"></script>
-    <script src="/__/firebase/init.js"></script>
--->    
-
-
     <!-- The core Firebase JS SDK is always required and must be listed first -->
     <script src="https://www.gstatic.com/firebasejs/7.9.3/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.9.3/firebase-messaging.js"></script>
 
     <!-- функции кнопок -->
-    <script src="js/index.js"></script>
     <script src="js/fcm-server-key.js"></script>
     <script src="js/manage-subscriptions.js"></script>
+    <script src="js/index.js"></script>
 </body>
 </html>

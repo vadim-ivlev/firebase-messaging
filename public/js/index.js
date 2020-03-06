@@ -39,41 +39,20 @@ function requestPermission() {
 // Callback fired if Instance ID token is updated.
 messaging.onTokenRefresh(() => {
     console.log("onTokenRefresh")
-    messaging.getToken().then(refreshedToken => {
-            console.log("Token refreshed.")
-            IID_TOKEN = refreshedToken
-            showToken(IID_TOKEN)
-            sendTokenToServer(IID_TOKEN)
-        })
-        .catch(err => {
-            console.log("Unable to retrieve refreshed token ", err)
-            showToken("Unable to retrieve refreshed token ")
-        })
-})
-
-// Handle incoming messages. Called when:
-// - a message is received while the app has focus
-// - the user clicks on an app notification created by a service worker
-//   `messaging.setBackgroundMessageHandler` handler.
-// Update the UI to include the received message.
-messaging.onMessage(payload => {
-    console.log("messaging.onMessage. ", payload)
-    const dataElement = document.createElement("pre")
-    dataElement.textContent = JSON.stringify(payload, null, 2)
-    document.querySelector("#messages").appendChild(dataElement)
+    getCurrentToken()
 })
 
 // Get Instance ID token. Initially this makes a network call, once retrieved
 // subsequent calls to getCurrentToken will return from cache.
 function getCurrentToken() {
-    console.log("getCurrentToken")
+    // console.log("getCurrentToken")
     IID_TOKEN = ""
     messaging.getToken().then(currentToken => {
             if (currentToken) {
                 console.log("currentToken=", currentToken)
                 IID_TOKEN = currentToken
                 showToken(IID_TOKEN)
-                sendTokenToServer(IID_TOKEN)
+                // sendTokenToServer(IID_TOKEN)
             } else {
                 console.log("No Instance ID token available. Request permission to generate one.")
             }
@@ -105,9 +84,9 @@ async function deleteToken() {
         })
 }
 
-// Send the Instance ID token your application server, so that it can:
-// - send messages back to this app
-// - subscribe/unsubscribe the token from topics
+// Послать Instance ID token на сервер, для того чтобы:
+// - можно было посылать сообщения этому приложению
+// - подписать токен на прием сообщений по какой то теме/топику
 async function sendTokenToServer(currentToken) {
     // Если токен уже был выслан второй раз он не посылается
     if (localStorage.getItem('tokenSentToServer') == currentToken)
@@ -118,6 +97,20 @@ async function sendTokenToServer(currentToken) {
     console.log('tokenSentToServer')
 }
 
+
+// Обработчик входящих сообщений. Вызывается когда:
+// - сообщение приходит когда приложение имеет фокус
+// - the user clicks on an app notification created by a service worker
+//   `messaging.setBackgroundMessageHandler` handler.
+messaging.onMessage(payload => {
+    console.log("messaging.onMessage. ", payload)
+    const dataElement = document.createElement("pre")
+    dataElement.textContent = JSON.stringify(payload, null, 2)
+    document.querySelector("#messages").appendChild(dataElement)
+})
+
+
+
 /**
  * Записывает токен в текстовое поле #token.
  * @param {*} token
@@ -126,4 +119,4 @@ function showToken(token) {
     document.querySelector("#token").value = token
 }
 
-getCurrentToken()
+// getCurrentToken()
