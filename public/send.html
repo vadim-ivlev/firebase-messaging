@@ -40,25 +40,7 @@
 
     <h4>Отправленные сообщения</h4>
 
-    <script src="js/fcm-server-key.js"></script>
-    <script src="js/send-message.js"></script>
-    <script>
-
-        function subscribeToRGRU(token) {
-            fetch('http://localhost:5001/rg-push/us-central1/subscribeIIDToRGRU?iid='+token)
-                .then(res => res.json())
-                .then(json => console.log(json))
-                .catch(err => console.log("ERROR:",err))
-        }
-
-        function unsubscribeFromRGRU(token) {
-            fetch('http://localhost:5001/rg-push/us-central1/unsubscribeIIDFromRGRU?iid='+token)
-                .then(res => res.json())
-                .then(json => console.log(json))
-                .catch(err => console.log("ERROR:",err))
-        }
-
-    </script>
+    <script src="js/functions.js"></script>
 
 </body>
 </html>

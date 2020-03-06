@@ -42,9 +42,8 @@
 
     
     3. Подписать токен на получение сообщений по теме (топику) 'rgru' <br><br>
-    <button onclick="subscribe([IID_TOKEN],'rgru')">Подписать токен на 'rgru'</button>
-    <button onclick="unsubscribe([IID_TOKEN],'rgru')" class="button-outline">Отписать токен от 'rgru'</button>
-    <!-- <input id="topic" type="text" placeholder="topic" value="rgru"/> -->
+    <button onclick="subscribeToRGRU(IID_TOKEN)">Подписать токен на 'rgru'</button>
+    <button onclick="unsubscribeFromRGRU(IID_TOKEN)" class="button-outline">Отписать токен от 'rgru'</button>
     <br>
     <br>
 
@@ -66,9 +65,7 @@
     <script src="https://www.gstatic.com/firebasejs/7.9.3/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.9.3/firebase-messaging.js"></script>
 
-    <!-- функции кнопок -->
-    <script src="js/fcm-server-key.js"></script>
-    <script src="js/manage-subscriptions.js"></script>
+    <script src="js/functions.js"></script>
     <script src="js/index.js"></script>
 </body>
 </html>

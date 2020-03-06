@@ -6,6 +6,7 @@ const cors = require('cors')({ origin: true })
 
 // Create and Deploy Cloud Functions
 // https://firebase.google.com/docs/functions/write-firebase-functions
+// https://firebase.google.com/docs/functions/http-events
 
 /**
  * Firebase функция
@@ -65,6 +66,38 @@ exports.unsubscribeIIDFromRGRU = functions.https.onRequest((request, response) =
 })
 
 
+/**
+ * Firebase функция
+ * Подписывает токен на топик rgru.
+ * 
+ * @param iid - Токен браузера подписчика. FCM Instanse Client Identifier. Token of users browser.
+ * @example http://localhost:5001/rg-push/us-central1/subscribeIIDToRGRU?iid=12345
+ */
+exports.sendMessage = functions.https.onRequest((request, response) => {  
+    return cors(request, response, () => {
+        const to = request.body.to
+        const message = request.body.message
+        const link = request.body.link
+
+        sendMessage(to, message, link)
+            .then(res => res.json())
+            .then(json => response.send(json))
+            .catch(err => {
+                console.log("ERR",err)
+                response.status(400).send(err) 
+            })
+        })
+})
+
+
+
+
+
+
+
+
+// Функции фактически выполняющие работу------------------------------------------------------------------------------
+
 
 /**
  * Подписывает токен на рассылку по топику
@@ -88,10 +121,6 @@ function subscribe(tokenList, topicName) {
 
 
 
-
-// Функции фактически выполняющие работу------------------------------------------------------------------------------
-
-
 /**
  * Отписывает токен от рассылки по топику
  * @param {*} tokenList массив токенов для подписки
@@ -111,3 +140,32 @@ function unsubscribe(tokenList, topicName) {
         })
     })
 }
+
+/**
+ * Посылает сообщение подписчикам топика или отдельному пользователю
+ * @param {*} to имя топика в виде /topics/topicName или токен пользователя
+ * @param {*} message текст сообщения
+ * @param {*} link ссылка сообщения
+ * @see 
+ */
+function sendMessage(to, message, link) {
+    var notification = {
+      'title': message,
+    //   'body': message,
+      'icon': 'https://rg.ru/favicon.ico',
+      'click_action': link
+    };
+
+    return fetch('https://fcm.googleapis.com/fcm/send', {
+      'method': 'POST',
+      'headers': {
+        'Authorization': 'key=' + FCM_SERVER_KEY,
+        'Content-Type': 'application/json'
+      },
+      'body': JSON.stringify({
+        'notification': notification,
+        'to': to
+      })
+  })
+}
+
