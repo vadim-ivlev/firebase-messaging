@@ -30,6 +30,6 @@ function sendMessage(to, message, link){
             }         
         )
         .then(res => res.json())
-        .then(json => console.log(json))
+        .then(json => console.log('sendMessage response', json))
         .catch(err => console.log("ERROR:",err))
 }

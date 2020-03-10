@@ -88,6 +88,8 @@ exports.sendMessage = functions.https.onRequest((request, response) => {
             .then(json => {
                 console.log("Message sent111111111")
                 addMessageToDatabase(message,link)
+                console.log("KEY=",FCM_SERVER_KEY )
+                console.log('!!! sendMessage results=',json.results)
                 response.send(json)
             })
             .catch(err => {

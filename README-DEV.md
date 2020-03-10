@@ -22,7 +22,7 @@
             });
         })
         .then(subscription => {
-            console.log(subscription);
+            console.log(subscription.endpoint);
         })
 
 
