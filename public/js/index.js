@@ -65,7 +65,7 @@ function getCurrentToken() {
 
 async function deleteToken() {
     console.log("deleteToken")
-    await unsubscribe([IID_TOKEN+'ssss'],'rgru')
+    await unsubscribeFromRGRU(IID_TOKEN)
     console.log('unsubscribed before deleting')
     messaging.getToken().then(currentToken => {
             messaging.deleteToken(currentToken)

@@ -23,3 +23,22 @@ h2 {
   background-size: 40px;
   padding-left: 50px;
 }
+
+
+
+.social-icon {
+    width: 28px;
+    height: 28px;
+    padding:4px;
+    border-radius: 4px;
+    vertical-align: middle;
+    /* border: 1px solid #9b4dca; */
+    
+}
+
+.social-icon:hover {
+    filter: invert(0.5) sepia(1) saturate(0) hue-rotate(280deg); 
+}
+input[type=text] {
+    background-color: white;
+}

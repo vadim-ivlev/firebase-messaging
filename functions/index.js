@@ -1,5 +1,9 @@
 const fetch = require('node-fetch');
 const functions = require('firebase-functions');
+const admin = require('firebase-admin');
+// admin.initializeApp(functions.config().firebase);
+admin.initializeApp();
+
 const FCM_SERVER_KEY = require('./fcm-server-key-module')
 const cors = require('cors')({ origin: true })
 
@@ -81,7 +85,11 @@ exports.sendMessage = functions.https.onRequest((request, response) => {
 
         sendMessage(to, message, link)
             .then(res => res.json())
-            .then(json => response.send(json))
+            .then(json => {
+                console.log("Message sent111111111")
+                addMessageToDatabase(message,link)
+                response.send(json)
+            })
             .catch(err => {
                 console.log("ERR",err)
                 response.status(400).send(err) 
@@ -169,3 +177,25 @@ function sendMessage(to, message, link) {
   })
 }
 
+
+
+function addMessageToDatabase(message, link){
+    console.log("addMessageToDatabase")
+    var FIREBASE_DATABASE = admin.database()
+    console.log("addMessageToDatabase1")
+
+    FIREBASE_DATABASE.ref('/notifications')
+    .push({
+    //   user: FIREBASE_AUTH.currentUser.displayName,
+      message: message,
+      link: link,
+    //   user: FIREBASE_AUTH.currentUser
+    })
+    .then(() => {
+        console.log("Message added to Database")
+    })
+    .catch((e) => {
+      console.log("Error adding message to Database:(" + e)
+    })
+
+}
