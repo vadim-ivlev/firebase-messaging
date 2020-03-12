@@ -1,11 +1,19 @@
+const cors = require('cors')({ origin: true })
 const fetch = require('node-fetch');
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 // admin.initializeApp(functions.config().firebase);
-admin.initializeApp();
-
+// console.log('functions.config().firebase=', functions.config().firebase)
+const APP = admin.initializeApp();
 const FCM_SERVER_KEY = require('./fcm-server-key-module')
-const cors = require('cors')({ origin: true })
+const FIREBASE_DATABASE = admin.database()
+
+
+exports.app = functions.https.onRequest((request, response) => {
+    console.log(APP)
+    response.contentType("text/plain")
+    response.send( JSON.stringify(APP.options, null, 2));
+   });
 
 
 // Create and Deploy Cloud Functions
@@ -77,19 +85,42 @@ exports.unsubscribeIIDFromRGRU = functions.https.onRequest((request, response) =
  * @param iid - Токен браузера подписчика. FCM Instanse Client Identifier. Token of users browser.
  * @example http://localhost:5001/rg-push/us-central1/subscribeIIDToRGRU?iid=12345
  */
+// exports.sendMessage = functions.https.onRequest((request, response) => {  
+//     return cors(request, response, async () => {
+//         const to = request.body.to
+//         const message = request.body.message
+//         const link = request.body.link
+
+//         try {
+//             let res = await sendMessage(to, message, link)
+//             let jso = await res.json()
+//             console.log('!!! sendMessage results=',jso.results)
+//             console.log('adding record to database')
+//             addMessageToDatabase(message,link)
+//             console.log('record is added to database')
+//             response.send(json)
+//         } catch (error) {
+//             console.log("ERR",err)
+//             response.status(400).send(err) 
+//         } 
+//     })
+// })
+
 exports.sendMessage = functions.https.onRequest((request, response) => {  
     return cors(request, response, () => {
         const to = request.body.to
         const message = request.body.message
         const link = request.body.link
+        const user = request.body.user || 'Tester'
 
         sendMessage(to, message, link)
             .then(res => res.json())
-            .then(json => {
-                console.log("Message sent111111111")
-                addMessageToDatabase(message,link)
-                console.log("KEY=",FCM_SERVER_KEY )
-                console.log('!!! sendMessage results=',json.results)
+            .then(async (json) => {
+                console.log('!!! sendMessage results=',json)
+                console.log('adding record to database')
+                await addMessageToDatabase(message,link, user)
+                console.log('record is added to database')
+
                 response.send(json)
             })
             .catch(err => {
@@ -98,7 +129,6 @@ exports.sendMessage = functions.https.onRequest((request, response) => {
             })
         })
 })
-
 
 
 
@@ -161,7 +191,7 @@ function unsubscribe(tokenList, topicName) {
 function sendMessage(to, message, link) {
     var notification = {
       'title': message,
-    //   'body': message,
+      'body': message,
       'icon': 'https://rg.ru/favicon.ico',
       'click_action': link
     };
@@ -174,23 +204,49 @@ function sendMessage(to, message, link) {
       },
       'body': JSON.stringify({
         'notification': notification,
-        'to': to
+        'to': to,
       })
-  })
+    })
+
+
+
+    // var topic = 'rgru';
+
+    // var message = {
+    //     notification: notification,            
+    //     data: {
+    //         score: '850',
+    //         time: '2:45'
+    //     },
+    //     topic: topic
+    // };
+    
+
+    // // Send a message to devices subscribed to the provided topic.
+    // return admin.messaging().send(message)
+    // .then((response) => {
+    //     // Response is a message ID string.
+    //     console.log('Successfully sent message:', response);
+    // })
+    // .catch((error) => {
+    //     console.log('Error sending message:', error);
+    // });
+
+
 }
 
 
 
-function addMessageToDatabase(message, link){
-    console.log("addMessageToDatabase")
-    var FIREBASE_DATABASE = admin.database()
+function addMessageToDatabase(message, link, user){
     console.log("addMessageToDatabase1")
-
-    FIREBASE_DATABASE.ref('/notifications')
+    return FIREBASE_DATABASE.ref('/notifications')
     .push({
     //   user: FIREBASE_AUTH.currentUser.displayName,
       message: message,
       link: link,
+      timestamp: Date.now(),
+      date_time: (new Date()).toUTCString(),
+      user, user
     //   user: FIREBASE_AUTH.currentUser
     })
     .then(() => {

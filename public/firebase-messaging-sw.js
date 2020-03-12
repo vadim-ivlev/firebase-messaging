@@ -44,15 +44,36 @@
 // If you would like to customize notifications that are received in the
 // background (Web app is closed or not in browser focus) then you should
 // implement this optional method.
-// messaging.setBackgroundMessageHandler(function(payload) {
-//   console.log('[firebase-messaging-sw.js] Received background message ', payload);
-//   // Customize notification here
-//   const notificationTitle = 'Background Message Title';
-//   const notificationOptions = {
-//     body: 'Background Message body.',
-//     icon: '/firebase-logo.png'
-//   };
+messaging.setBackgroundMessageHandler(function(payload) {
+  console.log('[firebase-messaging-sw.js] Received background message ', payload);
+  // Customize notification here
+  const notificationTitle = 'Background Message Title';
+  const notificationOptions = {
+    body: 'Background Message body.',
+    icon: '/firebase-logo.png'
+  };
 
-//   return self.registration.showNotification(notificationTitle,
-//     notificationOptions);
-// });
+  return self.registration.showNotification(notificationTitle,
+    notificationOptions);
+});
+
+
+self.addEventListener('notificationclick', function(event) {
+    console.log('On notification click: ', event.notification.tag);
+    clients.openWindow('http://www.door.com/');
+    // event.notification.close();
+  
+    // // This looks to see if the current is already open and
+    // // focuses if it is
+    // event.waitUntil(clients.matchAll({
+    //   type: "window"
+    // }).then(function(clientList) {
+    //   for (var i = 0; i < clientList.length; i++) {
+    //     var client = clientList[i];
+    //     if (client.url == '/' && 'focus' in client)
+    //       return client.focus();
+    //   }
+    //   if (clients.openWindow)
+    //     return clients.openWindow('/');
+    // }));
+  });
