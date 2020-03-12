@@ -2,18 +2,19 @@ const cors = require('cors')({ origin: true })
 const fetch = require('node-fetch');
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-// admin.initializeApp(functions.config().firebase);
+const APP = admin.initializeApp(functions.config().firebase);
 // console.log('functions.config().firebase=', functions.config().firebase)
-const APP = admin.initializeApp();
+// const APP = admin.initializeApp();
 const FCM_SERVER_KEY = require('./fcm-server-key-module')
-const FIREBASE_DATABASE = admin.database()
+
 
 
 exports.app = functions.https.onRequest((request, response) => {
     console.log(APP)
     response.contentType("text/plain")
     response.send( JSON.stringify(APP.options, null, 2));
-   });
+});
+
 
 
 // Create and Deploy Cloud Functions
@@ -28,8 +29,10 @@ exports.app = functions.https.onRequest((request, response) => {
  * @example http://localhost:5001/rg-push/us-central1/subscribeIIDToRGRU?iid=12345
  */
 exports.subscribeIIDToRGRU = functions.https.onRequest((request, response) => {  
+    
     return cors(request, response, () => {
         const iid = request.query.iid
+        const topicName = request.query.topic || 'rgru'
         if (!iid) {
             response.status(400).send({
                 error:'No iid',
@@ -38,9 +41,12 @@ exports.subscribeIIDToRGRU = functions.https.onRequest((request, response) => {
             return
         }
 
-        subscribe([iid],'rgru')
+        subscribe([iid],topicName)
             .then(res => res.json())
-            .then(json => response.send(json))
+            .then(json => {
+                incCounter('subscribed_to_'+topicName)
+                response.send(json)
+            })
             .catch(err => {
                 console.log("ERR",err)
                 response.status(400).send(err) 
@@ -59,6 +65,7 @@ exports.subscribeIIDToRGRU = functions.https.onRequest((request, response) => {
 exports.unsubscribeIIDFromRGRU = functions.https.onRequest((request, response) => {  
     return cors(request, response, () => {
         const iid = request.query.iid
+        const topicName = request.query.topic || 'rgru'
         if (!iid) {
             response.status(400).send({
                 error:'No iid',
@@ -67,9 +74,12 @@ exports.unsubscribeIIDFromRGRU = functions.https.onRequest((request, response) =
             return
         }
 
-        unsubscribe([iid],'rgru')
+        unsubscribe([iid],topicName)
             .then(res => res.json())
-            .then(json => response.send(json))
+            .then(json => {
+                incCounter('unsubscribed_from_'+topicName)
+                response.send(json)
+            })
             .catch(err => {
                 console.log("ERR",err)
                 response.status(400).send(err) 
@@ -85,27 +95,6 @@ exports.unsubscribeIIDFromRGRU = functions.https.onRequest((request, response) =
  * @param iid - Токен браузера подписчика. FCM Instanse Client Identifier. Token of users browser.
  * @example http://localhost:5001/rg-push/us-central1/subscribeIIDToRGRU?iid=12345
  */
-// exports.sendMessage = functions.https.onRequest((request, response) => {  
-//     return cors(request, response, async () => {
-//         const to = request.body.to
-//         const message = request.body.message
-//         const link = request.body.link
-
-//         try {
-//             let res = await sendMessage(to, message, link)
-//             let jso = await res.json()
-//             console.log('!!! sendMessage results=',jso.results)
-//             console.log('adding record to database')
-//             addMessageToDatabase(message,link)
-//             console.log('record is added to database')
-//             response.send(json)
-//         } catch (error) {
-//             console.log("ERR",err)
-//             response.status(400).send(err) 
-//         } 
-//     })
-// })
-
 exports.sendMessage = functions.https.onRequest((request, response) => {  
     return cors(request, response, () => {
         const to = request.body.to
@@ -115,10 +104,11 @@ exports.sendMessage = functions.https.onRequest((request, response) => {
 
         sendMessage(to, message, link)
             .then(res => res.json())
-            .then(async (json) => {
+            .then((json) => {
                 console.log('!!! sendMessage results=',json)
                 console.log('adding record to database')
-                await addMessageToDatabase(message,link, user)
+                addMessageToDatabase(message,link, user)
+                incCounter('messages')
                 console.log('record is added to database')
 
                 response.send(json)
@@ -127,11 +117,34 @@ exports.sendMessage = functions.https.onRequest((request, response) => {
                 console.log("ERR",err)
                 response.status(400).send(err) 
             })
-        })
+    })
 })
 
 
 
+
+exports.notifications = functions.https.onRequest((request, response) => {
+    return cors(request, response, () => {
+
+        console.log("notifications START--------------------------------------------------------------------")
+        
+        var db = admin.database();
+        var ref =db.ref('/notifications')
+        ref.once('value')
+        .then(function (snapshot) {
+            console.log("---------------------------->notifications snapshot", snapshot)
+            response.send(snapshot)
+        })
+        .catch(err => {
+            console.log("---------------------------->notifications error", err)
+            response.send(err)
+        })
+        .finally(()=>{
+            console.log("notifications END------------------------------------------------------------------")
+        })
+
+    })
+});
 
 
 
@@ -207,38 +220,13 @@ function sendMessage(to, message, link) {
         'to': to,
       })
     })
-
-
-
-    // var topic = 'rgru';
-
-    // var message = {
-    //     notification: notification,            
-    //     data: {
-    //         score: '850',
-    //         time: '2:45'
-    //     },
-    //     topic: topic
-    // };
-    
-
-    // // Send a message to devices subscribed to the provided topic.
-    // return admin.messaging().send(message)
-    // .then((response) => {
-    //     // Response is a message ID string.
-    //     console.log('Successfully sent message:', response);
-    // })
-    // .catch((error) => {
-    //     console.log('Error sending message:', error);
-    // });
-
-
 }
 
 
 
 function addMessageToDatabase(message, link, user){
     console.log("addMessageToDatabase1")
+    const FIREBASE_DATABASE = admin.database()
     return FIREBASE_DATABASE.ref('/notifications')
     .push({
     //   user: FIREBASE_AUTH.currentUser.displayName,
@@ -256,4 +244,17 @@ function addMessageToDatabase(message, link, user){
       console.log("Error adding message to Database:(" + e)
     })
 
+}
+
+function incCounter(counterName) {
+    admin.database().ref('/counters/'+ counterName)
+    .transaction(count => {
+        if (count === null) {
+            console.log("new counter --------------------------")
+            return count = 1
+        } else {
+            console.log("counter incremented -------------------------")
+            return count + 1
+        }
+    })
 }

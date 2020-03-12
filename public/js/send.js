@@ -8,7 +8,7 @@ const signInButton = document.getElementById('sign-in');
 const signOutButton = document.getElementById('sign-out');
 const mainArea = document.getElementById('main-area');
 const userEmail = document.getElementById('user-email');
-
+var USER = null;
 
 /* ========================
   Event Listeners
@@ -51,6 +51,7 @@ function signOut() {
 function handleAuthStateChanged(user) {
     if (user) {
         // User is signed in
+        USER = user
         console.log("user is signed in", user) 
         signInButton.style.display="none"
         signOutButton.style.display="inline-block"
@@ -58,6 +59,7 @@ function handleAuthStateChanged(user) {
         userEmail.innerText=user.email
     } else {
         // User is not signed in
+        USER = null
         console.log("user is not signed in")
         signOutButton.style.display="none"
         signInButton.style.display="inline-block"
@@ -66,3 +68,4 @@ function handleAuthStateChanged(user) {
     }
   }
   
+// ----------------------------------- --------------------------------------------------
