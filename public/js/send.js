@@ -69,3 +69,21 @@ function handleAuthStateChanged(user) {
   }
   
 // ----------------------------------- --------------------------------------------------
+
+
+// D A T A B A S E ---------------------------------
+
+const db = firebase.database()
+const notRef = db.ref('/notifications')
+
+function getData() {  
+  notRef.on('value',
+    ((snapshot) => {
+      var  val = snapshot.val()
+      console.log("val=", val)
+    }),
+    ( err => {
+      console.log('err=', err)
+    })
+  )  
+}
