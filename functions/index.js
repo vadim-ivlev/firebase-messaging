@@ -128,12 +128,13 @@ exports.notifications = functions.https.onRequest((request, response) => {
 
         console.log("notifications START--------------------------------------------------------------------")
         
-        var db = admin.database();
-        var ref =db.ref('/notifications')
-        ref.once('value')
+        // var db = admin.database();
+        // var ref =db.ref('/notifications')
+        // ref.once('value')
+        return admin.database().ref('/notifications').once('value')
         .then(function (snapshot) {
             console.log("---------------------------->notifications snapshot", snapshot)
-            response.send(snapshot)
+            response.send(snapshot.val())
         })
         .catch(err => {
             console.log("---------------------------->notifications error", err)
