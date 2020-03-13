@@ -25,8 +25,8 @@
             event.preventDefault();
             var stepsDiv = document.getElementById('steps-div');
             stepsDiv.style.display = (stepsDiv.style.display == 'none')? 'block':'none';
-            event.target.innerText = (stepsDiv.style.display == 'none')? '► отдельные шаги':'▼ отдельные шаги ';
-        ">► отдельные шаги</a>
+            event.target.innerText = (stepsDiv.style.display == 'none')? '► показать отдельные шаги':'▼ скрыть отдельные шаги ';
+        ">► показать отдельные шаги</a>
 
     <div id="steps-div" style="display:none;">
     
@@ -46,11 +46,12 @@
         <br>
 
 
-        
-        3. Подписать токен на получение сообщений по теме (топику) 'rgru' <br><br>
-        <button onclick="SUBSCRIPTION_TO_RGRU.subscribeTokenToTopic(SUBSCRIPTION_TO_RGRU.getCurrentToken(), SUBSCRIPTION_TO_RGRU.getTopic())">Подписать токен на 'rgru'</button>
-        <button onclick="SUBSCRIPTION_TO_RGRU.unsubscribeTokenFromTopic(SUBSCRIPTION_TO_RGRU.getCurrentToken(), SUBSCRIPTION_TO_RGRU.getTopic())" class="button-outline">Отписать токен от 'rgru'</button>
-    
+        <div style="background-color: whitesmoke; padding:20px;">
+            3. Подписать токен на получение сообщений по топику: &nbsp;&nbsp;
+            <input id="topic" type="text" value='rgru' placeholder="топик" style="width:150px;"/>
+            <button onclick="SUBSCRIPTION_TO_RGRU.subscribeTokenToTopic(SUBSCRIPTION_TO_RGRU.getCurrentToken(), document.getElementById('topic').value)">Подписать токен на 'rgru'</button>
+            <button onclick="SUBSCRIPTION_TO_RGRU.unsubscribeTokenFromTopic(SUBSCRIPTION_TO_RGRU.getCurrentToken(), document.getElementById('topic').value)" class="button-outline">Отписать токен от 'rgru'</button>
+        </div>
     </div>
     <br>
     <br>

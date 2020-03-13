@@ -9,11 +9,11 @@ const FCM_SERVER_KEY = require('./fcm-server-key-module')
 
 
 
-exports.app = functions.https.onRequest((request, response) => {
-    console.log(APP)
-    response.contentType("text/plain")
-    response.send( JSON.stringify(APP.options, null, 2));
-});
+// exports.app = functions.https.onRequest((request, response) => {
+//     console.log(APP)
+//     response.contentType("text/plain")
+//     response.send( JSON.stringify(APP.options, null, 2));
+// });
 
 
 
@@ -26,9 +26,9 @@ exports.app = functions.https.onRequest((request, response) => {
  * Подписывает токен на топик rgru.
  * 
  * @param iid - Токен браузера подписчика. FCM Instanse Client Identifier. Token of users browser.
- * @example http://localhost:5001/rg-push/us-central1/subscribeIIDToRGRU?iid=12345
+ * @example http://localhost:5001/rg-push/us-central1/subscribe_token_to_topic?iid=12345
  */
-exports.subscribeIIDToRGRU = functions.https.onRequest((request, response) => {  
+exports.subscribe_token_to_topic = functions.https.onRequest((request, response) => {  
     
     return cors(request, response, () => {
         const iid = request.query.iid
@@ -60,9 +60,9 @@ exports.subscribeIIDToRGRU = functions.https.onRequest((request, response) => {
  * Подписывает токен на топик rgru.
  * 
  * @param iid - Токен браузера подписчика. FCM Instanse Client Identifier. Token of users browser.
- * @example http://localhost:5001/rg-push/us-central1/subscribeIIDToRGRU?iid=12345
+ * @example http://localhost:5001/rg-push/us-central1/unsubscribe_token_from_topic?iid=12345
  */
-exports.unsubscribeIIDFromRGRU = functions.https.onRequest((request, response) => {  
+exports.unsubscribe_token_from_topic = functions.https.onRequest((request, response) => {  
     return cors(request, response, () => {
         const iid = request.query.iid
         const topicName = request.query.topic || 'rgru'
@@ -93,7 +93,7 @@ exports.unsubscribeIIDFromRGRU = functions.https.onRequest((request, response) =
  * Подписывает токен на топик rgru.
  * 
  * @param iid - Токен браузера подписчика. FCM Instanse Client Identifier. Token of users browser.
- * @example http://localhost:5001/rg-push/us-central1/subscribeIIDToRGRU?iid=12345
+ * @example http://localhost:5001/rg-push/us-central1/sendMessage
  */
 exports.sendMessage = functions.https.onRequest((request, response) => {  
     return cors(request, response, () => {
@@ -105,11 +105,11 @@ exports.sendMessage = functions.https.onRequest((request, response) => {
         sendMessage(to, message, link)
             .then(res => res.json())
             .then((json) => {
-                console.log('!!! sendMessage results=',json)
-                console.log('adding record to database')
+                // console.log('!!! sendMessage results=',json)
+                // console.log('adding record to database')
                 addMessageToDatabase(message,link, user)
                 incCounter('/counters/messages')
-                console.log('record is added to database')
+                // console.log('record is added to database')
 
                 response.send(json)
             })
@@ -123,29 +123,29 @@ exports.sendMessage = functions.https.onRequest((request, response) => {
 
 
 
-exports.notifications = functions.https.onRequest((request, response) => {
-    return cors(request, response, () => {
+// exports.notifications = functions.https.onRequest((request, response) => {
+//     return cors(request, response, () => {
 
-        console.log("notifications START--------------------------------------------------------------------")
+//         console.log("notifications START--------------------------------------------------------------------")
         
-        // var db = admin.database();
-        // var ref =db.ref('/notifications')
-        // ref.once('value')
-        return admin.database().ref('/notifications').once('value')
-        .then(function (snapshot) {
-            console.log("---------------------------->notifications snapshot", snapshot)
-            response.send(snapshot.val())
-        })
-        .catch(err => {
-            console.log("---------------------------->notifications error", err)
-            response.send(err)
-        })
-        .finally(()=>{
-            console.log("notifications END------------------------------------------------------------------")
-        })
+//         // var db = admin.database();
+//         // var ref =db.ref('/notifications')
+//         // ref.once('value')
+//         return admin.database().ref('/notifications').once('value')
+//         .then(function (snapshot) {
+//             console.log("---------------------------->notifications snapshot", snapshot)
+//             response.send(snapshot.val())
+//         })
+//         .catch(err => {
+//             console.log("---------------------------->notifications error", err)
+//             response.send(err)
+//         })
+//         .finally(()=>{
+//             console.log("notifications END------------------------------------------------------------------")
+//         })
 
-    })
-});
+//     })
+// });
 
 
 
@@ -225,8 +225,14 @@ function sendMessage(to, message, link) {
 
 
 
+/**
+ * Добавляет запись о сообщении в базу данных
+ * @param {*} message 
+ * @param {*} link 
+ * @param {*} user 
+ */
 function addMessageToDatabase(message, link, user){
-    console.log("addMessageToDatabase1")
+    console.log("addMessageToDatabase")
     const FIREBASE_DATABASE = admin.database()
     return FIREBASE_DATABASE.ref('/notifications')
     .push({
@@ -234,7 +240,7 @@ function addMessageToDatabase(message, link, user){
       message: message,
       link: link,
       timestamp: Date.now(),
-      date_time: (new Date()).toUTCString(),
+    //   date_time: (new Date()).toUTCString(),
       user, user
     //   user: FIREBASE_AUTH.currentUser
     })
@@ -247,14 +253,18 @@ function addMessageToDatabase(message, link, user){
 
 }
 
+/**
+ * Потокобезопасно инкрементирует счетчик
+ * @param {*} counterName 
+ */
 function incCounter(counterName) {
     admin.database().ref(counterName)
     .transaction(count => {
         if (count === null) {
-            console.log("new counter -------------------------- "+counterName)
+            // console.log("new counter -------------------------- "+counterName)
             return count = 1
         } else {
-            console.log("counter incremented ------------------------- "+counterName)
+            // console.log("counter incremented ------------------------- "+counterName)
             return count + 1
         }
     })

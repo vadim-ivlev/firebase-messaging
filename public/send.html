@@ -59,8 +59,12 @@
 
     <br><br><br>
     
-    <h4>Статистика подписки</h4>
-    <div id="counters"></div>
+    <h4>Статистика</h4>
+    Топики
+    <div id="topic-counters"></div>
+    Счетчики
+    <div id="counters" style="max-width: 300px; background-color: whitesmoke; padding:20px; margin-bottom: 40px;"></div>
+    
 
     <h4>Отправленные сообщения</h4>
     <div id="messages"></div>
@@ -92,6 +96,10 @@
     <script src="js/counters.js"></script>
     <script>
         _WatchCounters('counters')
+    </script>
+    <script src="js/topic-counters.js"></script>
+    <script>
+        _WatchTopicCounters('topic-counters')
     </script>
   
 

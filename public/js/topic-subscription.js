@@ -44,7 +44,7 @@ function _TopicSubscription(subscriptionTopic, onMessageCallback){
 
     function subscribeTokenToTopic(token, topic) {
         if (!token) return
-        return fetch( `${functionUrl}subscribeIIDToRGRU?iid=${token}&topic=${topic}`)
+        return fetch( `${functionUrl}subscribe_token_to_topic?iid=${token}&topic=${topic}`)
             .then(res => res.json())
             .then(json => console.log(json))
             .catch(err => console.log("ERROR:",err))
@@ -52,7 +52,7 @@ function _TopicSubscription(subscriptionTopic, onMessageCallback){
     
     function unsubscribeTokenFromTopic(token, topic) {
         if (!token) return
-        return fetch(`${functionUrl}unsubscribeIIDFromRGRU?iid=${token}&topic=${topic}`)
+        return fetch(`${functionUrl}unsubscribe_token_from_topic?iid=${token}&topic=${topic}`)
             .then(res => res.json())
             .then(json => console.log(json))
             .catch(err => console.log("ERROR:",err))

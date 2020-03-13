@@ -1,6 +1,7 @@
-function _WatchCounters(containerName){
-    firebase.database().ref('/counters')
-    .on('value', (snap) => buildTable(containerName, snap.val()), (err) => console.log('_WatchCounters ERR=', err))
+function _WatchTopicCounters(containerName){
+    const db = firebase.database()
+    const ref = db.ref('/topics_counters')
+    ref.on('value', (snap) => buildTable(containerName, snap.val()), (err) => console.log('_WatchTopicCounters ERR=', err))
 
     // builds a table in containerName element.
     function buildTable(containerName,data) {
@@ -17,7 +18,8 @@ function _WatchCounters(containerName){
             tableRows += `
             <tr>
                 <td>${k}</a><td>
-                <td>${v}<td>
+                <td>${v['subscribed']}<td>
+                <td>${v['unsubscribed']}<td>
             </tr>
             `
         }
@@ -25,8 +27,9 @@ function _WatchCounters(containerName){
         <table>
             <thead>
                 <tr>
-                    <th>счетчик<th>
-                    <th>значение<th>
+                    <th>топик<th>
+                    <th>подписались<th>
+                    <th>отписались<th>
                 </tr>
             </thead>
             <tbody>

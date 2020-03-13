@@ -2,14 +2,14 @@ var functionUrl = document.location.hostname == 'localhost' ? 'http://localhost:
 
 
 function subscribeTokenToTopic(token,topic) {
-    fetch( functionUrl +`subscribeIIDToRGRU?iid=${token}&topic=${topic}`)
+    fetch( functionUrl +`subscribe_token_to_topic?iid=${token}&topic=${topic}`)
         .then(res => res.json())
         .then(json => console.log(json))
         .catch(err => console.log("ERROR:",err))
 }
 
 function unsubscribeTokenFromTopic(token, topic) {
-    fetch(functionUrl +`unsubscribeIIDFromRGRU?iid=${token}&topic=${topic}`)
+    fetch(functionUrl +`unsubscribe_token_from_topic?iid=${token}&topic=${topic}`)
         .then(res => res.json())
         .then(json => console.log(json))
         .catch(err => console.log("ERROR:",err))
