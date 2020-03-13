@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Send message</title>
+    <title>Отправка уведомлений</title>
 
     <link rel="stylesheet" href="css/main.css">
     <script src="js/functions.js"></script>
@@ -11,53 +11,59 @@
 </head>
 <body>
 
-    <div style="display:grid; grid-template-columns: 1fr auto auto; align-items: center;">
-        <h2 >Отправка уведомлений</h2>
-        <button id="sign-in" class="button button-outline" >sign-in <img src="images/google-colored.svg" class="social-icon">oogle</button>
-        <button id="sign-out" class="button button-outline" style="display:none;"  >sign-out
-            <span id="user-email"></span>
-        </button>
-    </div>
+    <h2>Отправка уведомлений</h2>
+    <b>Тестирование отправки push уведомлений</b>.<br> 
+    Для отправки сообщений необходимо <a href='javascript:signIn()'>авторизоваться</a><br><br><br>
+   
 
+    <div id="main-area" style="background-color: whitesmoke; padding: 20px; display:none;">
 
-    <b>Тестирование отправки уведомлений</b>. Откройте консоль браузера для просмотра результатов операций.<br><br>
-
-    <div id="main-area" style="display:none;">
         <h4>Отправить сообщение</h4>
         <label for="txt">Текст сообщения</label>
         <input id="txt" type="text"  placeholder="текст сообщения" value="Верховный суд разъяснил, чем угон автомобиля отличается от кражи"/>
         <label for="link">Ссылка</label>
         <input id="link" type="text"  placeholder="ссылка" value="https://rg.ru/2020/03/02/verhovnyj-sud-raziasnil-chem-ugon-avtomobilia-otlichaetsia-ot-krazhi.html"/>
-        <br><br>
 
-        <button onclick="sendMessageAndGetNotifications('/topics/rgru', document.getElementById('txt').value, document.getElementById('link').value)">
-            Разослать сообщение подписчикам топика 'rgru'
-        </button>
-        <br><br>
-        <input id="to" type="text" value='' placeholder="токен пользователя" />
-        <button onclick="sendMessageAndGetNotifications(document.getElementById('to').value, document.getElementById('txt').value, document.getElementById('link').value)">Послать сообщение пользователю</button>
-        
-        
-        <br><br><br><br>
+        <label>Токен пользователя или имя топика в виде '/topics/topicName'</label>
+        <input id="to" type="text" value='/topics/rgru' placeholder="токен пользователя или /topics/topicName" />
+        <button onclick="sendMessageAndGetNotifications(document.getElementById('to').value, document.getElementById('txt').value, document.getElementById('link').value)">Послать сообщение</button>
+        <div style="text-align: right;">
+            <a href='javascript:signOut()'>Деавторизовать <span id="user-email"></span></a> 
+        </div>
+    </div> 
+    <br><br>
+
 
 
         <div style="background-color: whitesmoke; padding: 20px;">
-            <h4>Подписать на получение сообщений</h4>
-            <input id="token" type="text" value='' placeholder="токен для подписки" />
-            <button onclick="subscribeToRGRU(document.getElementById('token').value)">Подписать токен на 'rgru'</button>
-            <button onclick="unsubscribeFromRGRU(document.getElementById('token').value)" class="button-outline">Отписать токен от 'rgru'</button>
+            <h4>Подписать токен на получение сообщений по топику</h4>
+            <div style="display: grid; grid-template-columns:1fr 150px ; column-gap: 10px;">
+                <div>
+                    <label>токен</label>
+                    <input id="token" type="text" value='' placeholder="токен для подписки" />
+                </div>
+                <div>
+                    <label>топик</label>
+                    <input id="topic" type="text" value='rgru' placeholder="топик" />
+                </div>
+            </div>
+            <button onclick="subscribeTokenToTopic(document.getElementById('token').value, document.getElementById('topic').value)">Подписать токен</button>
+            <button onclick="unsubscribeTokenFromTopic(document.getElementById('token').value, document.getElementById('topic').value)" class="button-outline">Отписать токен</button>
         </div>
 
 
         
 
-    </div>
+
 
 
     <br><br><br>
-    <h4>Отправленные сообщения</h4>
-    <button onclick="getData()">get data</button><button onclick="getNotifications()">getNotifications</button>
     
+    <h4>Статистика подписки</h4>
+    <div id="counters"></div>
+
+    <h4>Отправленные сообщения</h4>
+    <div id="messages"></div>
     
 
 <!-- 
@@ -78,7 +84,15 @@
 
     <script src="/__/firebase/7.9.3/firebase.js"></script>
     <script src="/__/firebase/init.js"></script>
-    <script src="js/send.js"></script>
+    <script src="js/authorization.js"></script>
+    <script src="js/messages.js"></script>
+    <script>
+        _WatchMessages('messages')
+    </script>
+    <script src="js/counters.js"></script>
+    <script>
+        _WatchCounters('counters')
+    </script>
   
 
 </body>

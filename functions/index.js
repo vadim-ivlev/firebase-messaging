@@ -44,7 +44,7 @@ exports.subscribeIIDToRGRU = functions.https.onRequest((request, response) => {
         subscribe([iid],topicName)
             .then(res => res.json())
             .then(json => {
-                incCounter('subscribed_to_'+topicName)
+                incCounter('/topics_counters/'+ topicName+'/subscribed')
                 response.send(json)
             })
             .catch(err => {
@@ -77,7 +77,7 @@ exports.unsubscribeIIDFromRGRU = functions.https.onRequest((request, response) =
         unsubscribe([iid],topicName)
             .then(res => res.json())
             .then(json => {
-                incCounter('unsubscribed_from_'+topicName)
+                incCounter('/topics_counters/'+ topicName+'/unsubscribed')
                 response.send(json)
             })
             .catch(err => {
@@ -108,7 +108,7 @@ exports.sendMessage = functions.https.onRequest((request, response) => {
                 console.log('!!! sendMessage results=',json)
                 console.log('adding record to database')
                 addMessageToDatabase(message,link, user)
-                incCounter('messages')
+                incCounter('/counters/messages')
                 console.log('record is added to database')
 
                 response.send(json)
@@ -248,13 +248,13 @@ function addMessageToDatabase(message, link, user){
 }
 
 function incCounter(counterName) {
-    admin.database().ref('/counters/'+ counterName)
+    admin.database().ref(counterName)
     .transaction(count => {
         if (count === null) {
-            console.log("new counter --------------------------")
+            console.log("new counter -------------------------- "+counterName)
             return count = 1
         } else {
-            console.log("counter incremented -------------------------")
+            console.log("counter incremented ------------------------- "+counterName)
             return count + 1
         }
     })

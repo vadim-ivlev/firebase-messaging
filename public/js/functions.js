@@ -1,15 +1,15 @@
 var functionUrl = document.location.hostname == 'localhost' ? 'http://localhost:5001/rg-push/us-central1/' : ' https://us-central1-rg-push.cloudfunctions.net/';
 
 
-function subscribeToRGRU(token) {
-    fetch( functionUrl +'subscribeIIDToRGRU?iid='+token)
+function subscribeTokenToTopic(token,topic) {
+    fetch( functionUrl +`subscribeIIDToRGRU?iid=${token}&topic=${topic}`)
         .then(res => res.json())
         .then(json => console.log(json))
         .catch(err => console.log("ERROR:",err))
 }
 
-function unsubscribeFromRGRU(token) {
-    fetch(functionUrl +'unsubscribeIIDFromRGRU?iid='+token)
+function unsubscribeTokenFromTopic(token, topic) {
+    fetch(functionUrl +`unsubscribeIIDFromRGRU?iid=${token}&topic=${topic}`)
         .then(res => res.json())
         .then(json => console.log(json))
         .catch(err => console.log("ERROR:",err))
