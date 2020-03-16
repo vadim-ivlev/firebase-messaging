@@ -3,6 +3,9 @@
     npm install -g firebase-tools@lates firebase-admin@latest
     firebase login
 
+    cd functions
+    npm i
+
 
 #### Development
 

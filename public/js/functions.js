@@ -39,30 +39,3 @@ function sendMessage(to, message, link){
 }
 
 
-
-function sendMessageAndGetNotifications(to, message, link) {
-    console.log("sendMessageAndGetNotifications START")
-    sendMessage(to, message, link)
-    .then(() => {
-        getNotifications()
-    })
-    .catch(error =>{
-        console.log("ERR:", error) 
-    })
-    console.log("sendMessageAndGetNotifications END")
-}
-
-
-function getNotifications() {
-    console.log("getNotifications START")
-
-    fetch(functionUrl+'notifications')
-    .then(res => res.json())
-    .then(json => {
-        console.log("getNotifications response:", json)
-    })
-    .catch( error => {
-        console.log("getNotifications error: ", error)   
-        return error     
-    })
-}

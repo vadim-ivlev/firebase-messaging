@@ -6,8 +6,7 @@
     <title>Отправка уведомлений</title>
 
     <link rel="stylesheet" href="css/main.css">
-    <script src="js/functions.js"></script>
-
+    
 </head>
 <body>
 
@@ -26,7 +25,7 @@
 
         <label>Токен пользователя или имя топика в виде '/topics/topicName'</label>
         <input id="to" type="text" value='/topics/rgru' placeholder="токен пользователя или /topics/topicName" />
-        <button onclick="sendMessageAndGetNotifications(document.getElementById('to').value, document.getElementById('txt').value, document.getElementById('link').value)">Послать сообщение</button>
+        <button onclick="sendMessage(document.getElementById('to').value, document.getElementById('txt').value, document.getElementById('link').value)">Послать сообщение</button>
         <div style="text-align: right;">
             <a href='javascript:signOut()'>Деавторизовать <span id="user-email"></span></a> 
         </div>
@@ -69,6 +68,10 @@
     <h4>Отправленные сообщения</h4>
     <div id="messages"></div>
     
+     <script src="js/functions.js"></script>
+
+
+
 
 <!-- 
     <script src="https://www.gstatic.com/firebasejs/7.9.3/firebase.js"></script>
@@ -85,6 +88,8 @@
         })
     </script>
  -->
+
+
 
     <script src="/__/firebase/7.9.3/firebase.js"></script>
     <script src="/__/firebase/init.js"></script>
