@@ -1,6 +1,17 @@
 function _TopicSubscription(subscriptionTopic, onMessageCallback){
 
-    var app = firebase.initializeApp({
+    // var app = firebase.initializeApp({
+    //     apiKey: "AIzaSyB1Kb1oqVigcSoVTEb5An0tXgRRygSO6vE",
+    //     authDomain: "rg-push.firebaseapp.com",
+    //     databaseURL: "https://rg-push.firebaseio.com",
+    //     projectId: "rg-push",
+    //     storageBucket: "rg-push.appspot.com",
+    //     messagingSenderId: "666454432034",
+    //     appId: "1:666454432034:web:b2ddca1d2dd1fbbe4dad7b",
+    //     measurementId: "G-RGP6KVRXG5"
+    // },'rgruTopics')
+
+    var firebaseConfig = {
         apiKey: "AIzaSyB1Kb1oqVigcSoVTEb5An0tXgRRygSO6vE",
         authDomain: "rg-push.firebaseapp.com",
         databaseURL: "https://rg-push.firebaseio.com",
@@ -9,7 +20,12 @@ function _TopicSubscription(subscriptionTopic, onMessageCallback){
         messagingSenderId: "666454432034",
         appId: "1:666454432034:web:b2ddca1d2dd1fbbe4dad7b",
         measurementId: "G-RGP6KVRXG5"
-    },'rgruTopics')
+    }
+    if (location.hostname === 'localhost'){
+        console.log ("Using firebase emulator http://localhost:9000")
+        firebaseConfig.databaseURL = "http://localhost:9000?ns=rg-push"
+    }
+    var app = firebase.initializeApp(firebaseConfig,'rgruTopics')
 
     const messaging = firebase.messaging(app)
     
