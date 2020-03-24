@@ -155,7 +155,7 @@ exports.onMessageWrite = functions.database.ref('/messages').onWrite((change, co
         for (let key of Object.keys(newMessages)) if (!oldMessages[key]) return key
     }
     // -------------------------------------------------------
-    
+
     try {
         console.log('context.params.pushId=', context.params.pushId);
         console.log('context.auth.token.email=',context.auth.token.email);
@@ -177,7 +177,60 @@ exports.onMessageWrite = functions.database.ref('/messages').onWrite((change, co
     return admin.database().ref('/messages/'+newKey).set(newMessage)
 }) 
 
+// exports.scheduledFunction = functions.pubsub.schedule('every 5 minutes').onRun((context) => {
+// exports.scheduledFunction = functions.pubsub.schedule('*/1 * * * *').onRun((context) => {
+//   console.log('------------------------------This will be run every  minute!');
+//   return null;
+// });
 
+exports.send_scheduled_messages = functions.https.onRequest((request, response) => {
+    return cors(request, response, async () => {
+
+        try {
+            await sendScheduledMessages()
+            console.log("send_scheduled_messages---------------end")
+            response.send({result:'ok'})
+        } catch (err) {
+            console.error("send_scheduled_messages--------------error", err)
+            response.send({result:err})
+        }
+    
+    })
+})
+
+// function sendScheduledMessages(){
+//     return admin.database().ref('/messages').once('value')
+//         .then(function (snapshot) {
+//             let messages = snapshot.val()
+//             for (let [k,v] of Object.entries(messages)){
+//                 if (v.status != 'scheduled') continue
+//                 if (Date.now() < v.scheduled_time) continue
+//                 console.log('k=',k)
+//             }
+
+//         })
+//         .catch(err => {
+//             console.error("---------------------------->messages error", err)
+//         })
+//         .finally(()=>{
+//             console.log("---------------------------->messages END")
+//         })
+// }
+function sendScheduledMessages(){
+    return admin.database().ref('/messages').once('value',
+        (snapshot) => {
+            let messages = snapshot.val()
+            for (let [k,v] of Object.entries(messages)){
+                if (v.status != 'scheduled') continue
+                if (Date.now() < v.scheduled_time) continue
+                console.log('k=',k)
+            }
+        },
+        (err) => {
+            console.error("---------------------------->messages error", err)
+        }    
+    )
+}
 
 // exports.notifications = functions.https.onRequest((request, response) => {
 //     return cors(request, response, () => {

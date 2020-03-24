@@ -81,8 +81,8 @@ Javascrit файл `public/js/topic-subscription.js`, должен быть по
 Минимальный пример использования
 ```html
 
-    <script src="https://www.gstatic.com/firebasejs/7.9.3/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.9.3/firebase-messaging.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.12.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.12.0/firebase-messaging.js"></script>
     <script src="js/topic-subscription.js"></script>
     <script>
         _TopicSubscription('rgru')
@@ -95,8 +95,8 @@ Javascrit файл `public/js/topic-subscription.js`, должен быть по
 
 ```html
 
-    <script src="https://www.gstatic.com/firebasejs/7.9.3/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.9.3/firebase-messaging.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.12.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.12.0/firebase-messaging.js"></script>
     <script src="js/topic-subscription.js"></script>
     <script>
         _TopicSubscription('rgru', payload => {
