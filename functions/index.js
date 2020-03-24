@@ -3,7 +3,7 @@ const fetch = require('node-fetch');
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const APP = admin.initializeApp(functions.config().firebase);
-console.log('functions.config().firebase=', functions.config().firebase)
+// console.log('functions.config().firebase=', functions.config().firebase)
 // const APP = admin.initializeApp();
 const FCM_SERVER_KEY = require('./fcm-server-key-module')
 
@@ -100,7 +100,7 @@ exports.sendMessage = functions.https.onRequest((request, response) => {
 
         // const tokenId = request.get('Authorization').split('Bearer ')[1];
         // console.log('tokenId=', tokenId)
-        console.log('request=', request)
+        // console.log('request=', request)
 
         // return admin.auth().verifyIdToken(tokenId)
         //   .then((decoded) => res.status(200).send(decoded))
@@ -147,6 +147,35 @@ exports.sendMessage = functions.https.onRequest((request, response) => {
     })
 })
 
+
+
+
+exports.onMessageWrite = functions.database.ref('/messages').onWrite((change, context) => {
+    function getNewKey(oldMessages, newMessages) {
+        for (let key of Object.keys(newMessages)) if (!oldMessages[key]) return key
+    }
+    // -------------------------------------------------------
+    
+    try {
+        console.log('context.params.pushId=', context.params.pushId);
+        console.log('context.auth.token.email=',context.auth.token.email);
+    } catch (error) { }
+    
+    
+    let oldMessages = change.before.exists()? change.before.val() : {}
+    let newMessages = change.after.exists() ? change.after.val()  : {} 
+    
+    let newKey = getNewKey(oldMessages, newMessages)
+    if (! newKey) return null
+    
+    let newMessage = newMessages[newKey]
+    newMessage['created_time']= Date.now()
+    newMessage['scheduled_time']= newMessage['created_time'] + parseInt(newMessage['wait'])*60*1000
+    console.log('newKey=', newKey)
+    // console.log('newMessage=', newMessage)
+    incCounter('/counters/created')
+    return admin.database().ref('/messages/'+newKey).set(newMessage)
+}) 
 
 
 

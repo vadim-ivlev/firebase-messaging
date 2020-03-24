@@ -13,7 +13,8 @@ function _WatchFirebasePath(path, callback){
 
 _WatchFirebasePath('/counters', showCounters )
 _WatchFirebasePath('/topics_counters', showTopicCounters )
-_WatchFirebasePath('/notifications', showMessages )
+// _WatchFirebasePath('/notifications', showMessages )
+_WatchFirebasePath('/messages', showMessages )
 
 
 
@@ -95,7 +96,16 @@ function showTopicCounters(data) {
     `
 }
 
-
+function formatTimestamp(timestamp){
+    let t0 = new Date( parseInt(timestamp) )
+    let yyyy = t0.getFullYear()
+    let mm = numeral(t0.getMonth()+1).format('00')
+    let dd = numeral(t0.getDate()).format('00')
+    let hh = numeral(t0.getHours()).format('00')
+    let mi = numeral(t0.getMinutes()).format('00')
+    let ss = numeral(t0.getSeconds()).format('00')
+    return `${yyyy}/${mm}/${dd}&nbsp;${hh}:${mi}:${ss}`
+}
 
 function showMessages(data) {
     var container = document.getElementById('messages')
@@ -111,13 +121,18 @@ function showMessages(data) {
 
     let tableRows = ''
     for (let [k,v] of Object.entries(data)){
-        let t = new Date( parseInt(v['timestamp']) )
+        let timeCreated = formatTimestamp( v['created_time'] )
+        let timeScheduled = formatTimestamp( v['scheduled_time'] )
         
         tableRows += `
         <tr>
-            <td><a href="${v['link']}" target="_blank">${v['message']}</a><td>
-            <td>${v['user']}<td>
-            <td>${t.getFullYear()}.${t.getMonth()}.${t.getDate()} ${t.getHours()}:${t.getMinutes()}:${t.getSeconds()}<td>
+            <td><a href="${v['link']}" target="_blank">${v['message']}</a><br>${k}<td>
+            <td>${v['user']}<br>${v['to']} <td>
+            <td>${timeCreated}<br>${timeScheduled}<td>
+            <td>${v['status']}
+                <br>
+                in ${v['wait']} min
+            <td>
         </tr>
         `
     }
@@ -126,8 +141,9 @@ function showMessages(data) {
         <thead>
             <tr>
                 <th>сообщение<th>
-                <th>кто<th>
-                <th>когда<th>
+                <th>кто<br>кому<th>
+                <th>создано<br>запланировано<th>
+                <th>статус<br>послать через<th>
             </tr>
         </thead>
         <tbody>

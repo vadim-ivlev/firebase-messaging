@@ -25,7 +25,22 @@
 
         <label>Токен пользователя или имя топика в виде '/topics/topicName'</label>
         <input id="to" type="text" value='/topics/rgru' placeholder="токен пользователя или /topics/topicName" />
-        <button onclick="sendMessage(document.getElementById('to').value, document.getElementById('txt').value, document.getElementById('link').value)">Послать сообщение</button>
+
+        <label>Статус сообщения. 'scheduled' - для посылки через означенное время</label>
+        <input id="status" type="text" value='scheduled' placeholder="Статус сообщения. 'scheduled' - для посылки через означенное время" />
+
+        <label>Послать сообщение со статусом 'scheduled' через (мин)</label>
+        <input id="wait" type="number" value="5" placeholder="Время до посылки сообщения в минутах" />
+
+        <!-- <button onclick="sendMessage(document.getElementById('to').value, document.getElementById('txt').value, document.getElementById('link').value)" class="button-outline">Послать сообщение</button> -->
+        <button onclick="createMessage(
+            document.getElementById('to').value, 
+            document.getElementById('txt').value, 
+            document.getElementById('link').value, 
+            document.getElementById('wait').value,
+            document.getElementById('status').value,
+            document.getElementById('user-email').innerText)">Создать сообщение</button>
+
         <div style="text-align: right;">
             <a href='javascript:signOut()'>Деавторизовать <span id="user-email"></span></a> 
         </div>
@@ -69,7 +84,7 @@
     <div id="messages"></div>
     
     
-        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>     
     
         <script src="https://www.gstatic.com/firebasejs/7.9.3/firebase.js"></script>
         <script>
@@ -85,7 +100,7 @@
             }
             if (location.hostname === 'localhost'){
                 console.log ("Using firebase emulator http://localhost:9000")
-                firebaseConfig.databaseURL = "http://localhost:9000?ns=rg-push" //?ns=happy-todolist"
+                firebaseConfig.databaseURL = "http://localhost:9000?ns=rg-push" 
             }
             firebase.initializeApp(firebaseConfig)
         </script>
@@ -97,9 +112,10 @@
     <script src="/__/firebase/init.js"></script> 
 -->
 
-    <script src="js/send-functions.js"></script>
-    <script src="js/send-authorization.js"></script>
-    <script src="js/send.js"></script>
+    <script src="js/db-secret.js"></script>
+    <script src="js/functions.js"></script>
+    <script src="js/authorization.js"></script>
+    <script src="js/watchers.js"></script>
 
 </body>
 </html>
