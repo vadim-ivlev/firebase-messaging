@@ -42,3 +42,9 @@ h2 {
 input[type=text] {
     background-color: white;
 }
+
+
+.scheduled {
+  font-weight: bold;
+  color: blueviolet;
+}

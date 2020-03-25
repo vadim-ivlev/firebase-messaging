@@ -1,6 +1,7 @@
 function _WatchFirebasePath(path, callback){
     if (!path) return
     
+    // on child_added ?
     firebase.database().ref(path).on('value', 
         (snap) => {
             if (typeof callback == 'function')
@@ -120,7 +121,12 @@ function showMessages(data) {
     }
 
     let tableRows = ''
-    for (let [k,v] of Object.entries(data)){
+
+    var messages = Object.entries(data)
+    // Сортируем данные
+    var sortedMessages = messages.sort((a,b)=> a[0] > b[0] ? -1 : 0)
+
+    for (let [k,v] of sortedMessages){
         let timeCreated = formatTimestamp( v['created_time'] )
         let timeScheduled = formatTimestamp( v['scheduled_time'] )
         
@@ -129,7 +135,10 @@ function showMessages(data) {
             <td><a href="${v['link']}" target="_blank">${v['message']}</a><br>${k}<td>
             <td>${v['user']}<br>${v['to']} <td>
             <td>${timeCreated}<br>${timeScheduled}<td>
-            <td>${v['status']}
+            <td> 
+                <span class="${v['status']=='scheduled'?'scheduled':''}">
+                    ${v['status']}
+                </span>
                 <br>
                 in ${v['wait']} min
             <td>

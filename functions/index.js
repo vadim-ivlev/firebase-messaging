@@ -155,23 +155,31 @@ exports.onMessageWrite = functions.database.ref('/messages').onWrite((change, co
         for (let key of Object.keys(newMessages)) if (!oldMessages[key]) return key
     }
     // -------------------------------------------------------
-
+    let email = ''
     try {
-        console.log('context.params.pushId=', context.params.pushId);
-        console.log('context.auth.token.email=',context.auth.token.email);
+        email = context.auth.token.email
     } catch (error) { }
-    
+    console.log('email=',email);
+
     
     let oldMessages = change.before.exists()? change.before.val() : {}
     let newMessages = change.after.exists() ? change.after.val()  : {} 
     
+    // проверим появилось ли новое сообщение
     let newKey = getNewKey(oldMessages, newMessages)
+    console.log('newKey=', newKey)
     if (! newKey) return null
-    
+
+    // удалим новое соощение  если пользователь неправильный
+    if (!['vadim.ivlev@gmail.com', 'maxchagin@gmail.com'].includes(email) ){
+        console.log(`User ${email} has no permitions`)
+        // return admin.database().ref('/messages/'+newKey).set(null)
+    }
+
+    // подправим поля
     let newMessage = newMessages[newKey]
     newMessage['created_time']= Date.now()
     newMessage['scheduled_time']= newMessage['created_time'] + parseInt(newMessage['wait'])*60*1000
-    console.log('newKey=', newKey)
     // console.log('newMessage=', newMessage)
     incCounter('/counters/created')
     return admin.database().ref('/messages/'+newKey).set(newMessage)
@@ -218,12 +226,18 @@ exports.send_scheduled_messages = functions.https.onRequest((request, response) 
 // }
 function sendScheduledMessages(){
     return admin.database().ref('/messages').once('value',
-        (snapshot) => {
+        async (snapshot) => {
             let messages = snapshot.val()
+            if (! messages) return null;
+
             for (let [k,v] of Object.entries(messages)){
                 if (v.status != 'scheduled') continue
                 if (Date.now() < v.scheduled_time) continue
                 console.log('k=',k)
+                await sendMessage(v.to, v.message, v.link)
+                console.log(' ==== message sent')
+                await admin.database().ref('/messages').child(k).update({ 'status': 'sent'})
+                console.log(' ==== db updated')
             }
         },
         (err) => {
@@ -321,7 +335,6 @@ function sendMessage(to, message, link) {
       'icon': 'https://rg.ru/favicon.ico',
       'click_action': link
     };
-
     return fetch('https://fcm.googleapis.com/fcm/send', {
       'method': 'POST',
       'headers': {

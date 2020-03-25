@@ -15,9 +15,9 @@
     Для отправки сообщений необходимо <a href='javascript:signIn()'>авторизоваться</a><br><br><br>
    
 
-    <div id="main-area" style="background-color: whitesmoke; padding: 20px; display:none;">
+    <div id="main-area" style="background-color: whitesmoke; padding: 20px; max-width: 900px; margin:auto; display:none;">
 
-        <h4>Отправить сообщение</h4>
+        <h4>Cообщение</h4>
         <label for="txt">Текст сообщения</label>
         <input id="txt" type="text"  placeholder="текст сообщения" value="Верховный суд разъяснил, чем угон автомобиля отличается от кражи"/>
         <label for="link">Ссылка</label>
@@ -25,21 +25,24 @@
 
         <label>Токен пользователя или имя топика в виде '/topics/topicName'</label>
         <input id="to" type="text" value='/topics/rgru' placeholder="токен пользователя или /topics/topicName" />
-
-        <label>Статус сообщения. 'scheduled' - для посылки через означенное время</label>
-        <input id="status" type="text" value='scheduled' placeholder="Статус сообщения. 'scheduled' - для посылки через означенное время" />
-
-        <label>Послать сообщение со статусом 'scheduled' через (мин)</label>
-        <input id="wait" type="number" value="5" placeholder="Время до посылки сообщения в минутах" />
-
-        <!-- <button onclick="sendMessage(document.getElementById('to').value, document.getElementById('txt').value, document.getElementById('link').value)" class="button-outline">Послать сообщение</button> -->
+        <div style="display: none;">
+            <label>Статус сообщения.</label>
+            <input id="status" type="text" value='scheduled' placeholder="Статус сообщения. 'scheduled' - для посылки через означенное время" style="width:200px;"/>
+            <b>&nbsp;&nbsp;&nbsp; scheduled - для посылки через означенное время</b>
+            <br>
+            </div>
+        <b>Послать сообщение через </b>
+        <input id="wait" type="number" value="5" placeholder="Время до посылки сообщения в минутах" style="width: 100px; background-color: white;"/>
+        <b> минут</b><br>
+        <button onclick="sendMessage(document.getElementById('to').value, document.getElementById('txt').value, document.getElementById('link').value)" class="button-outline">Послать немедленно</button>
         <button onclick="createMessage(
             document.getElementById('to').value, 
             document.getElementById('txt').value, 
             document.getElementById('link').value, 
             document.getElementById('wait').value,
             document.getElementById('status').value,
-            document.getElementById('user-email').innerText)">Создать сообщение</button>
+            document.getElementById('user-email').innerText)">Запланировать сообщение</button>
+        <button onclick="sendScheduledMessages()" class="button-outline">Послать запланированные сообщения</button>
 
         <div style="text-align: right;">
             <a href='javascript:signOut()'>Деавторизовать <span id="user-email"></span></a> 
@@ -49,39 +52,41 @@
 
 
 
-        <div style="background-color: whitesmoke; padding: 20px;">
-            <h4>Подписать токен на получение сообщений по топику</h4>
-            <div style="display: grid; grid-template-columns:1fr 150px ; column-gap: 10px;">
-                <div>
-                    <label>токен</label>
-                    <input id="token" type="text" value='' placeholder="токен для подписки" />
-                </div>
-                <div>
-                    <label>топик</label>
-                    <input id="topic" type="text" value='rgru' placeholder="топик" />
-                </div>
-            </div>
-            <button onclick="subscribeTokenToTopic(document.getElementById('token').value, document.getElementById('topic').value)">Подписать токен</button>
-            <button onclick="unsubscribeTokenFromTopic(document.getElementById('token').value, document.getElementById('topic').value)" class="button-outline">Отписать токен</button>
-        </div>
-
-
-        
-
-
-
-
-    <br><br><br>
     
-    <h4>Статистика</h4>
-    Топики
-    <div id="topic-counters"></div>
-    Счетчики
-    <div id="counters" style="max-width: 300px; background-color: whitesmoke; padding:20px; margin-bottom: 40px;"></div>
-    
+
 
     <h4>Отправленные сообщения</h4>
-    <div id="messages"></div>
+    <div id="messages" style="max-height: 600px; overflow: auto;  border: 1px solid silver; padding: 20px;"></div>
+
+    <br><br><br>
+
+    <div style="text-align: center;">
+        <h4 >Статистика</h4>
+        <div>Топики</div>
+        <div id="topic-counters" style="max-width: 500px; background-color: whitesmoke; padding:20px; margin-bottom: 40px; margin:auto;"></div>
+        <div>Счетчики</div>
+        <div id="counters" style="max-width: 300px; background-color: whitesmoke; padding:20px; margin-bottom: 40px; margin:auto;"></div>
+    </div>
+    
+    <br><br>
+    <h4>Подписать токен на получение сообщений по топику</h4>
+    Если вам известен токен пользователя, вы можете подписать его на получение сообщений
+    <br>
+    <div style="background-color: whitesmoke; padding: 20px;">
+        <div style="display: grid; grid-template-columns:1fr 150px ; column-gap: 10px;">
+            <div>
+                <label>токен</label>
+                <input id="token" type="text" value='' placeholder="токен для подписки" />
+            </div>
+            <div>
+                <label>топик</label>
+                <input id="topic" type="text" value='rgru' placeholder="топик" />
+            </div>
+        </div>
+        <button onclick="subscribeTokenToTopic(document.getElementById('token').value, document.getElementById('topic').value)">Подписать токен</button>
+        <button onclick="unsubscribeTokenFromTopic(document.getElementById('token').value, document.getElementById('topic').value)" class="button-outline">Отписать токен</button>
+    </div>
+
     
     
         <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>     
