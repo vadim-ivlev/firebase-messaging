@@ -34,13 +34,20 @@
         <b>Послать сообщение через </b>
         <input id="wait" type="number" value="5" placeholder="Время до посылки сообщения в минутах" style="width: 100px; background-color: white;"/>
         <b> минут</b><br>
-        <button onclick="sendMessage(document.getElementById('to').value, document.getElementById('txt').value, document.getElementById('link').value)" class="button-outline">Послать немедленно</button>
+        <!-- <button onclick="sendMessage(document.getElementById('to').value, document.getElementById('txt').value, document.getElementById('link').value)" class="button-outline">Послать немедленно</button> -->
+        <button onclick="createMessage(
+            document.getElementById('to').value, 
+            document.getElementById('txt').value, 
+            document.getElementById('link').value, 
+            0,
+            //document.getElementById('status').value,
+            document.getElementById('user-email').innerText)">Послать немедленно</button>
         <button onclick="createMessage(
             document.getElementById('to').value, 
             document.getElementById('txt').value, 
             document.getElementById('link').value, 
             document.getElementById('wait').value,
-            document.getElementById('status').value,
+            //document.getElementById('status').value,
             document.getElementById('user-email').innerText)">Запланировать сообщение</button>
         <button onclick="sendScheduledMessages()" class="button-outline">Послать запланированные сообщения</button>
 

@@ -16,28 +16,28 @@ function unsubscribeTokenFromTopic(token, topic) {
         .catch(err => console.log("ERROR:",err))
 }
 
-function sendMessage(to, message, link){
-    return fetch(functionUrl +'sendMessage',
-            {
-                'method': 'POST',
-                'headers': {
-                    'Content-Type': 'application/json'
-                },
-                'body': JSON.stringify({
-                    'to': to,
-                    'message': message,
-                    'link': link
-                })
-            }         
-        )
-        .then(res => res.json())
-        .then(json => {
-            console.log('sendMessage response', json)
-        })
-        .catch(err => {
-            console.log("ERROR:",err)
-        })
-}
+// function sendMessage(to, message, link){
+//     return fetch(functionUrl +'sendMessage',
+//             {
+//                 'method': 'POST',
+//                 'headers': {
+//                     'Content-Type': 'application/json'
+//                 },
+//                 'body': JSON.stringify({
+//                     'to': to,
+//                     'message': message,
+//                     'link': link
+//                 })
+//             }         
+//         )
+//         .then(res => res.json())
+//         .then(json => {
+//             console.log('sendMessage response', json)
+//         })
+//         .catch(err => {
+//             console.log("ERROR:",err)
+//         })
+// }
 
 
 
@@ -69,9 +69,14 @@ function sendMessage(to, message, link){
 // }
 
 
-function createMessage(to, message, link, wait, status, user){
-    firebase.database().ref('/messages').push({to, message, link, wait, status, user})
+function createMessage(to, message, link, wait, /*status,*/ user){
+    firebase.database().ref('/messages').push({to, message, link, wait, /*status,*/ user})
 }
+
+function deleteMessage(key){
+    firebase.database().ref('/messages').child(key).remove()
+}
+
 
 function sendScheduledMessages(){
     fetch(functionUrl +`send_scheduled_messages`)

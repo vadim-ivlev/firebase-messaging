@@ -132,16 +132,19 @@ function showMessages(data) {
         
         tableRows += `
         <tr>
-            <td><a href="${v['link']}" target="_blank">${v['message']}</a><br>${k}<td>
-            <td>${v['user']}<br>${v['to']} <td>
-            <td>${timeCreated}<br>${timeScheduled}<td>
+            <td><a href="${v['link']}" target="_blank">${v['message']}</a><br>${k}</td>
+            <td>${v['user']}<br>${v['to']} </td>
+            <td>${timeCreated}<br>${timeScheduled}</td>
             <td> 
                 <span class="${v['status']=='scheduled'?'scheduled':''}">
                     ${v['status']}
                 </span>
                 <br>
                 in ${v['wait']} min
+            </td>
             <td>
+                <a href="javascript:deleteMessage('${k}')">✕</a>
+            </td>
         </tr>
         `
     }
@@ -149,10 +152,11 @@ function showMessages(data) {
     <table>
         <thead>
             <tr>
-                <th>сообщение<th>
-                <th>кто<br>кому<th>
-                <th>создано<br>запланировано<th>
-                <th>статус<br>послать через<th>
+                <th>сообщение</th>
+                <th>кто<br>кому</th>
+                <th>создано<br>запланировано</th>
+                <th>статус<br>послать через</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>

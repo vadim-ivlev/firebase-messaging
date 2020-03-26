@@ -23,7 +23,7 @@ function signIn() {
             console.table("user=", user)
         })
         .catch(function(error) {
-            console.log("signIn ERROR:", user)
+            console.log("signIn ERROR:", error)
         })
 }
 

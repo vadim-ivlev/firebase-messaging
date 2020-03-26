@@ -8,15 +8,6 @@ const APP = admin.initializeApp(functions.config().firebase);
 const FCM_SERVER_KEY = require('./fcm-server-key-module')
 
 
-
-// exports.app = functions.https.onRequest((request, response) => {
-//     console.log(APP)
-//     response.contentType("text/plain")
-//     response.send( JSON.stringify(APP.options, null, 2));
-// });
-
-
-
 // Create and Deploy Cloud Functions
 // https://firebase.google.com/docs/functions/write-firebase-functions
 // https://firebase.google.com/docs/functions/http-events
@@ -88,64 +79,64 @@ exports.unsubscribe_token_from_topic = functions.https.onRequest((request, respo
 })
 
 
-/**
- * Firebase функция
- * Подписывает токен на топик rgru.
- * 
- * @param iid - Токен браузера подписчика. FCM Instanse Client Identifier. Token of users browser.
- * @example http://localhost:5001/rg-push/us-central1/sendMessage
- */
-exports.sendMessage = functions.https.onRequest((request, response) => {  
-    return cors(request, response, () => {
+// /**
+//  * Firebase функция
+//  * Подписывает токен на топик rgru.
+//  * 
+//  * @param iid - Токен браузера подписчика. FCM Instanse Client Identifier. Token of users browser.
+//  * @example http://localhost:5001/rg-push/us-central1/sendMessage
+//  */
+// exports.sendMessage = functions.https.onRequest((request, response) => {  
+//     return cors(request, response, () => {
 
-        // const tokenId = request.get('Authorization').split('Bearer ')[1];
-        // console.log('tokenId=', tokenId)
-        // console.log('request=', request)
+//         // const tokenId = request.get('Authorization').split('Bearer ')[1];
+//         // console.log('tokenId=', tokenId)
+//         // console.log('request=', request)
 
-        // return admin.auth().verifyIdToken(tokenId)
-        //   .then((decoded) => res.status(200).send(decoded))
-        //   .catch((err) => res.status(401).send(err));
+//         // return admin.auth().verifyIdToken(tokenId)
+//         //   .then((decoded) => res.status(200).send(decoded))
+//         //   .catch((err) => res.status(401).send(err));
     
 
 
-        const to = request.body.to
-        const message = request.body.message
-        const link = request.body.link
-        const user = request.body.user || 'Tester'
+//         const to = request.body.to
+//         const message = request.body.message
+//         const link = request.body.link
+//         const user = request.body.user || 'Tester'
 
-        sendMessage(to, message, link)
-            .then(res => res.json())
-            .then((json) => {
-                // console.log('!!! sendMessage results=',json)
-                // console.log('adding record to database')
-                addMessageToDatabase(message,link, user)
-                .then(()=>{
-                    console.log('addMessageToDatabase.then --------- ')
-                    incCounter('/counters/messages')
-                    .then(()=>{
-                        console.log('incCounter.then --------- ')
-                        response.send(json)
-                    })
-                    .catch((err)=>{
-                        console.log('incCounter.catch --------- ', err)
-                        response.send(json)
-                    })
-                })
-                .catch((err)=>{
-                    console.log('addMessageToDatabase.catch --------- ', err)
-                    response.send(json)
-                })
+//         sendMessage(to, message, link)
+//             .then(res => res.json())
+//             .then((json) => {
+//                 // console.log('!!! sendMessage results=',json)
+//                 // console.log('adding record to database')
+//                 addMessageToDatabase(message,link, user)
+//                 .then(()=>{
+//                     console.log('addMessageToDatabase.then --------- ')
+//                     incCounter('/counters/messages')
+//                     .then(()=>{
+//                         console.log('incCounter.then --------- ')
+//                         response.send(json)
+//                     })
+//                     .catch((err)=>{
+//                         console.log('incCounter.catch --------- ', err)
+//                         response.send(json)
+//                     })
+//                 })
+//                 .catch((err)=>{
+//                     console.log('addMessageToDatabase.catch --------- ', err)
+//                     response.send(json)
+//                 })
             
-                console.log('QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ')
+//                 console.log('QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ')
 
-                // response.send(json)
-            })
-            .catch(err => {
-                console.log("ERR",err)
-                response.status(400).send(err) 
-            })
-    })
-})
+//                 // response.send(json)
+//             })
+//             .catch(err => {
+//                 console.log("ERR",err)
+//                 response.status(400).send(err) 
+//             })
+//     })
+// })
 
 
 
@@ -173,23 +164,30 @@ exports.onMessageWrite = functions.database.ref('/messages').onWrite((change, co
     // удалим новое соощение  если пользователь неправильный
     if (!['vadim.ivlev@gmail.com', 'maxchagin@gmail.com'].includes(email) ){
         console.log(`User ${email} has no permitions`)
-        // return admin.database().ref('/messages/'+newKey).set(null)
+        return admin.database().ref('/messages').child(newKey).remove()
     }
 
     // подправим поля
     let newMessage = newMessages[newKey]
+    newMessage['status']= 'scheduled'
     newMessage['created_time']= Date.now()
     newMessage['scheduled_time']= newMessage['created_time'] + parseInt(newMessage['wait'])*60*1000
     // console.log('newMessage=', newMessage)
     incCounter('/counters/created')
     return admin.database().ref('/messages/'+newKey).set(newMessage)
+            .then(()=>{
+                sendScheduledMessages()
+            })
 }) 
 
 // exports.scheduledFunction = functions.pubsub.schedule('every 5 minutes').onRun((context) => {
-// exports.scheduledFunction = functions.pubsub.schedule('*/1 * * * *').onRun((context) => {
-//   console.log('------------------------------This will be run every  minute!');
-//   return null;
-// });
+
+exports.scheduledMessagesChecker = functions.pubsub.schedule('*/1 * * * *').onRun((context) => {
+  console.log('------------------------------This will be run every  minute!')
+  sendScheduledMessages()
+  return null
+});
+
 
 exports.send_scheduled_messages = functions.https.onRequest((request, response) => {
     return cors(request, response, async () => {
@@ -197,7 +195,7 @@ exports.send_scheduled_messages = functions.https.onRequest((request, response) 
         try {
             await sendScheduledMessages()
             console.log("send_scheduled_messages---------------end")
-            response.send({result:'ok'})
+            response.send({result:`ok`})
         } catch (err) {
             console.error("send_scheduled_messages--------------error", err)
             response.send({result:err})
@@ -228,8 +226,8 @@ function sendScheduledMessages(){
     return admin.database().ref('/messages').once('value',
         async (snapshot) => {
             let messages = snapshot.val()
-            if (! messages) return null;
-
+            if (! messages) return 0;
+            let count = 0
             for (let [k,v] of Object.entries(messages)){
                 if (v.status != 'scheduled') continue
                 if (Date.now() < v.scheduled_time) continue
@@ -238,38 +236,17 @@ function sendScheduledMessages(){
                 console.log(' ==== message sent')
                 await admin.database().ref('/messages').child(k).update({ 'status': 'sent'})
                 console.log(' ==== db updated')
+                incCounter('/counters/sent')
+                count++
             }
+            return count
         },
         (err) => {
             console.error("---------------------------->messages error", err)
+            return 0
         }    
     )
 }
-
-// exports.notifications = functions.https.onRequest((request, response) => {
-//     return cors(request, response, () => {
-
-//         console.log("notifications START--------------------------------------------------------------------")
-        
-//         // var db = admin.database();
-//         // var ref =db.ref('/notifications')
-//         // ref.once('value')
-//         return admin.database().ref('/notifications').once('value')
-//         .then(function (snapshot) {
-//             console.log("---------------------------->notifications snapshot", snapshot)
-//             response.send(snapshot.val())
-//         })
-//         .catch(err => {
-//             console.log("---------------------------->notifications error", err)
-//             response.send(err)
-//         })
-//         .finally(()=>{
-//             console.log("notifications END------------------------------------------------------------------")
-//         })
-
-//     })
-// });
-
 
 
 
@@ -350,34 +327,34 @@ function sendMessage(to, message, link) {
 
 
 
-/**
- * Добавляет запись о сообщении в базу данных
- * @param {*} message 
- * @param {*} link 
- * @param {*} user 
- */
-function addMessageToDatabase(message, link, user){
-    console.log("addMessageToDatabase ------------------------------")
-    const FIREBASE_DATABASE = admin.database()
-    // console.log("FIREBASE_DATABASE ------------------------------", FIREBASE_DATABASE)
-    return FIREBASE_DATABASE.ref('/notifications')
-    .push({
-    //   user: FIREBASE_AUTH.currentUser.displayName,
-      message: message,
-      link: link,
-      timestamp: Date.now(),
-    //   date_time: (new Date()).toUTCString(),
-      user, user
-    //   user: FIREBASE_AUTH.currentUser
-    })
-    // .then(() => {
-    //     console.log("Message added to Database------------------------------------")
-    // })
-    // .catch((e) => {
-    //   console.log("Error adding message to Database----------------------:(" + e)
-    // })
+// /**
+//  * Добавляет запись о сообщении в базу данных
+//  * @param {*} message 
+//  * @param {*} link 
+//  * @param {*} user 
+//  */
+// function addMessageToDatabase(message, link, user){
+//     console.log("addMessageToDatabase ------------------------------")
+//     const FIREBASE_DATABASE = admin.database()
+//     // console.log("FIREBASE_DATABASE ------------------------------", FIREBASE_DATABASE)
+//     return FIREBASE_DATABASE.ref('/notifications')
+//     .push({
+//     //   user: FIREBASE_AUTH.currentUser.displayName,
+//       message: message,
+//       link: link,
+//       timestamp: Date.now(),
+//     //   date_time: (new Date()).toUTCString(),
+//       user, user
+//     //   user: FIREBASE_AUTH.currentUser
+//     })
+//     // .then(() => {
+//     //     console.log("Message added to Database------------------------------------")
+//     // })
+//     // .catch((e) => {
+//     //   console.log("Error adding message to Database----------------------:(" + e)
+//     // })
 
-}
+// }
 
 /**
  * Потокобезопасно инкрементирует счетчик
