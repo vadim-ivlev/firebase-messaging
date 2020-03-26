@@ -1,0 +1,19 @@
+
+@local_url = http://localhost:9000
+@url = https://rg-push.firebaseio.com
+
+####################
+GET {{local_url}}/.json?ns=rg-push
+####################
+GET {{url}}/.json
+######################################
+
+
+POST {{local_url}}/messages.json
+Content-Type: application/json
+
+{
+  "message": "alanis awesome",
+  "link": "The Turing Machine"
+}
+

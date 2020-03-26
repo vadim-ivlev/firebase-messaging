@@ -1,5 +1,4 @@
 var functionUrl = document.location.hostname == 'localhost' ? 'http://localhost:5001/rg-push/us-central1/' : ' https://us-central1-rg-push.cloudfunctions.net/'
-// var databaseUrl = document.location.hostname == 'localhost' ? 'http://localhost:9000' : 'https://rg-push.firebaseio.com'
 
 
 function subscribeTokenToTopic(token,topic) {
@@ -16,58 +15,6 @@ function unsubscribeTokenFromTopic(token, topic) {
         .catch(err => console.log("ERROR:",err))
 }
 
-// function sendMessage(to, message, link){
-//     return fetch(functionUrl +'sendMessage',
-//             {
-//                 'method': 'POST',
-//                 'headers': {
-//                     'Content-Type': 'application/json'
-//                 },
-//                 'body': JSON.stringify({
-//                     'to': to,
-//                     'message': message,
-//                     'link': link
-//                 })
-//             }         
-//         )
-//         .then(res => res.json())
-//         .then(json => {
-//             console.log('sendMessage response', json)
-//         })
-//         .catch(err => {
-//             console.log("ERROR:",err)
-//         })
-// }
-
-
-
-// function createMessage0(to, message, link, wait, status, user){
-
-//     var messageData = {
-//         'to': to,
-//         'message': message,
-//         'link': link,
-//         'wait': wait,
-//         'user': user,
-//         'status': status
-//     }
-
-//     return fetch(`${databaseUrl}/messages.json?ns=rg-push` + (location.hostname == 'localhost' ? '':`&auth=${DB_SECRET}`),
-//             {
-//                 'method': 'POST',
-//                 'headers': { 'Content-Type': 'application/json' },
-//                 'body': JSON.stringify(messageData)
-//             }         
-//         )
-//         .then(res => res.json())
-//         .then(json => {
-//             console.log('createMessage response', json)
-//         })
-//         .catch(err => {
-//             console.log("createMessage ERROR:",err)
-//         })
-// }
-
 
 function createMessage(to, message, link, wait, /*status,*/ user){
     firebase.database().ref('/messages').push({to, message, link, wait, /*status,*/ user})
@@ -75,6 +22,22 @@ function createMessage(to, message, link, wait, /*status,*/ user){
 
 function deleteMessage(key){
     firebase.database().ref('/messages').child(key).remove()
+}
+
+async function editMessage(key){
+    var ref = firebase.database().ref('/messages').child(key)
+    var snap = await ref.once('value')
+    var msg = snap.val()
+    document.getElementById('to').value = msg.to 
+    document.getElementById('txt').value = msg.message
+    document.getElementById('link').value = msg.link
+    document.getElementById('wait').value = msg.wait
+    console.log(msg)
+    window.scrollTo(0,0)
+    document.getElementById('txt').focus()
+    document.getElementById('main-area').style.backgroundColor = 'silver'
+    setTimeout(()=>{ document.getElementById('main-area').style.backgroundColor = 'whitesmoke' },100)
+    ref.remove()
 }
 
 

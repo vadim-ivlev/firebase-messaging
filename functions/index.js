@@ -79,67 +79,6 @@ exports.unsubscribe_token_from_topic = functions.https.onRequest((request, respo
 })
 
 
-// /**
-//  * Firebase функция
-//  * Подписывает токен на топик rgru.
-//  * 
-//  * @param iid - Токен браузера подписчика. FCM Instanse Client Identifier. Token of users browser.
-//  * @example http://localhost:5001/rg-push/us-central1/sendMessage
-//  */
-// exports.sendMessage = functions.https.onRequest((request, response) => {  
-//     return cors(request, response, () => {
-
-//         // const tokenId = request.get('Authorization').split('Bearer ')[1];
-//         // console.log('tokenId=', tokenId)
-//         // console.log('request=', request)
-
-//         // return admin.auth().verifyIdToken(tokenId)
-//         //   .then((decoded) => res.status(200).send(decoded))
-//         //   .catch((err) => res.status(401).send(err));
-    
-
-
-//         const to = request.body.to
-//         const message = request.body.message
-//         const link = request.body.link
-//         const user = request.body.user || 'Tester'
-
-//         sendMessage(to, message, link)
-//             .then(res => res.json())
-//             .then((json) => {
-//                 // console.log('!!! sendMessage results=',json)
-//                 // console.log('adding record to database')
-//                 addMessageToDatabase(message,link, user)
-//                 .then(()=>{
-//                     console.log('addMessageToDatabase.then --------- ')
-//                     incCounter('/counters/messages')
-//                     .then(()=>{
-//                         console.log('incCounter.then --------- ')
-//                         response.send(json)
-//                     })
-//                     .catch((err)=>{
-//                         console.log('incCounter.catch --------- ', err)
-//                         response.send(json)
-//                     })
-//                 })
-//                 .catch((err)=>{
-//                     console.log('addMessageToDatabase.catch --------- ', err)
-//                     response.send(json)
-//                 })
-            
-//                 console.log('QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ')
-
-//                 // response.send(json)
-//             })
-//             .catch(err => {
-//                 console.log("ERR",err)
-//                 response.status(400).send(err) 
-//             })
-//     })
-// })
-
-
-
 
 exports.onMessageWrite = functions.database.ref('/messages').onWrite((change, context) => {
     function getNewKey(oldMessages, newMessages) {
@@ -327,34 +266,6 @@ function sendMessage(to, message, link) {
 
 
 
-// /**
-//  * Добавляет запись о сообщении в базу данных
-//  * @param {*} message 
-//  * @param {*} link 
-//  * @param {*} user 
-//  */
-// function addMessageToDatabase(message, link, user){
-//     console.log("addMessageToDatabase ------------------------------")
-//     const FIREBASE_DATABASE = admin.database()
-//     // console.log("FIREBASE_DATABASE ------------------------------", FIREBASE_DATABASE)
-//     return FIREBASE_DATABASE.ref('/notifications')
-//     .push({
-//     //   user: FIREBASE_AUTH.currentUser.displayName,
-//       message: message,
-//       link: link,
-//       timestamp: Date.now(),
-//     //   date_time: (new Date()).toUTCString(),
-//       user, user
-//     //   user: FIREBASE_AUTH.currentUser
-//     })
-//     // .then(() => {
-//     //     console.log("Message added to Database------------------------------------")
-//     // })
-//     // .catch((e) => {
-//     //   console.log("Error adding message to Database----------------------:(" + e)
-//     // })
-
-// }
 
 /**
  * Потокобезопасно инкрементирует счетчик

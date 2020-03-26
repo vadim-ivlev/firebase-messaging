@@ -143,7 +143,10 @@ function showMessages(data) {
                 in ${v['wait']} min
             </td>
             <td>
-                <a href="javascript:deleteMessage('${k}')">✕</a>
+                <a href="javascript:editMessage('${k}')">edit</a>
+                <br>
+                <a href="javascript:deleteMessage('${k}')">delete</a>
+                <!-- ✕ -->
             </td>
         </tr>
         `

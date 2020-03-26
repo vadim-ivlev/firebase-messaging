@@ -15,7 +15,7 @@
     Для отправки сообщений необходимо <a href='javascript:signIn()'>авторизоваться</a><br><br><br>
    
 
-    <div id="main-area" style="background-color: whitesmoke; padding: 20px; max-width: 900px; margin:auto; display:none;">
+    <div id="main-area" style="transition: background-color 200ms linear; background-color: whitesmoke; padding: 20px; max-width: 900px; margin:auto; display:none;">
 
         <h4>Cообщение</h4>
         <label for="txt">Текст сообщения</label>
@@ -34,20 +34,17 @@
         <b>Послать сообщение через </b>
         <input id="wait" type="number" value="5" placeholder="Время до посылки сообщения в минутах" style="width: 100px; background-color: white;"/>
         <b> минут</b><br>
-        <!-- <button onclick="sendMessage(document.getElementById('to').value, document.getElementById('txt').value, document.getElementById('link').value)" class="button-outline">Послать немедленно</button> -->
         <button onclick="createMessage(
             document.getElementById('to').value, 
             document.getElementById('txt').value, 
             document.getElementById('link').value, 
             0,
-            //document.getElementById('status').value,
             document.getElementById('user-email').innerText)">Послать немедленно</button>
         <button onclick="createMessage(
             document.getElementById('to').value, 
             document.getElementById('txt').value, 
             document.getElementById('link').value, 
             document.getElementById('wait').value,
-            //document.getElementById('status').value,
             document.getElementById('user-email').innerText)">Запланировать сообщение</button>
         <button onclick="sendScheduledMessages()" class="button-outline">Послать запланированные сообщения</button>
 
