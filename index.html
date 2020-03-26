@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset=utf-8 />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Подписка на топик</title>
+
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="manifest" href="/manifest.json">
+
+</head>
+<body>
+
+
+
+    <h2>Подписка на пуш уведомления <b><span style="color: rgb(237, 95, 44);">RG</span>RU</b></h2>
+
+
+    <b>Тестирование подписки на push уведомления Firebase Cloud Messaging.</b>  
+    
+    <p>
+        <br>
+        На этой странице ничего особенно делать не нужно если вы согласились на прием пуш уведомлений 
+        при первой загрузке страницы. Если отказались, изменить параметры
+        можно кликнув на значок в строке адреса браузера.
+        <br><br>
+        <img src="images/permition.png" alt="permition.png" style="width:500px; border:1px solid black;" >
+        <br><br>
+
+        При загрузке страницы, страница автоматически подписывается на прием сообщений
+        по топику <b>rgru</b>. 
+        
+        <br>
+        <br>
+        
+        <b>
+        Чтобы опубликовать сообщение перейдите на  
+        <a href="send.html" target="_blank">страницу отправки уведомлений</a>,
+        которую лучше открыть в другом браузере для чистоты эксперимента.
+        </b>
+        
+    </p>
+
+    
+    <br>       
+    Выполнить отдельные функции связанные с подпиской можно
+    кликнув здесь.
+    <br>      
+
+ 
+    <a href="" onclick="
+            event.preventDefault();
+            var stepsDiv = document.getElementById('steps-div');
+            stepsDiv.style.display = (stepsDiv.style.display == 'none')? 'block':'none';
+            event.target.innerText = (stepsDiv.style.display == 'none')? '► показать отдельные функции':'▼ скрыть отдельные функции ';
+        ">► показать отдельные функции</a>
+
+    <div id="steps-div" style="display:none;">
+        <br>
+        Откройте консоль браузера для просмотра результатов операций.
+        <br>
+        
+        <br>
+        1. Запросить разрешение на получение сообщений. <br><br>
+        <button onclick="SUBSCRIPTION_TO_RGRU.requestPermission()">Запросить разрешение</button> <br><br>    
+
+        
+        2. Получить токен браузера. <br><br>
+        <button onclick="document.querySelector('#token').value = SUBSCRIPTION_TO_RGRU.getCurrentToken()">Показать токен</button>
+        <button onclick="SUBSCRIPTION_TO_RGRU.deleteToken()" class="button-outline">Удалить токен</button>   
+        <div style="display:grid; grid-template-columns: 1fr auto;" >
+            <input id="token" type="text"  style="border-radius: 4px 0 0 4px;" />    
+            <button class="button button-outline far fa-copy" style="border-radius: 0 4px 4px 0;" 
+                onclick="document.querySelector('#token').select(); document.execCommand('copy');" >copy</button>
+        </div>
+        <br>
+
+
+        <div style="background-color: whitesmoke; padding:20px;">
+            3. Подписать токен на получение сообщений по топику: &nbsp;&nbsp;
+            <input id="topic" type="text" value='rgru' placeholder="топик" style="width:150px;"/>
+            <button onclick="SUBSCRIPTION_TO_RGRU.subscribeTokenToTopic(SUBSCRIPTION_TO_RGRU.getCurrentToken(), document.getElementById('topic').value)">Подписать токен</button>
+            <button onclick="SUBSCRIPTION_TO_RGRU.unsubscribeTokenFromTopic(SUBSCRIPTION_TO_RGRU.getCurrentToken(), document.getElementById('topic').value)" class="button-outline">Отписать токен</button>
+        </div>
+    </div>
+
+
+    <br><br> <br><br> 
+    <h4>Полученные сообщения</h4>
+    будут показаны ниже, если эта страница является верхней в браузере. 
+    Если браузер скрыт или эта страница не является верхней компьютер пользователя
+    покажет всплывающее уведомление.<br><br>    
+    <button onclick="document.querySelector('#messages').innerHTML = '';" class="button-outline">Удалить полученные сообщения</button><br>
+    <div id="messages"></div>
+
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.12.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.12.0/firebase-messaging.js"></script>
+    <script src="js/topic-subscription.js"></script>
+    <script>
+        var SUBSCRIPTION_TO_RGRU = _TopicSubscription('rgru', payload => {
+            console.log("messaging.onMessage. ", payload)
+            const dataElement = document.createElement("pre")
+            dataElement.textContent = JSON.stringify(payload, null, 2)
+            document.querySelector("#messages").appendChild(dataElement)
+        })
+
+        // var SUBSCRIPTION_TO_RGRU = _TopicSubscription('rgru')
+
+        // SUBSCRIPTION_TO_RGRU.setOnMessageCallback(payload => {
+        //     console.log("messaging.onMessage. ", payload)
+        //     const dataElement = document.createElement("pre")
+        //     dataElement.textContent = JSON.stringify(payload, null, 2)
+        //     document.querySelector("#messages").appendChild(dataElement)
+        // })
+
+    </script>
+</body>
+</html>

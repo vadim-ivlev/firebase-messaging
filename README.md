@@ -76,10 +76,10 @@ message-sheduler GraphQL API
 Firebase REST API
 -------
 
-- `messages.json` - возвращает список сообщений
-- `counters.json` - возвращает значения счетчиков
-- `subscribe_token_to_topic` - возвращает ok или ошибку
-- `unsubscribe_token_from_topic` - возвращает ok или ошибку
+- <https://rg-push.firebaseio.com/messages.json?print=pretty> - возвращает список сообщений
+- <https://rg-push.firebaseio.com/counters.json?print=pretty> - возвращает значения счетчиков
+- <https://us-central1-rg-push.cloudfunctions.net/subscribe_token_to_topic> - возвращает ok или ошибку
+- <https://us-central1-rg-push.cloudfunctions.net/unsubscribe_token_from_topic> - возвращает ok или ошибку
 
 Клиентская Javascrit библиотека
 -------
