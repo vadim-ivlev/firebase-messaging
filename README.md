@@ -40,7 +40,7 @@ Firebase Cloud Messaging API. Таким образом, необходимое 
 
 **Отпрака сообщений с задержкой**
 
-Задержка отправки сообщений реализована, для того, чтобы иметь время для коррекции или отмены сообщения если понадобится.
+Сообщения отправляются с задержкой, чтобы иметь время для коррекции или отмены сообщения.
 
 Редактор, пользуясь приложением `message-admin`, вызывает функцию create_message() приложения `message-scheduler` указав запланированное время отправки сообщения.
 
@@ -52,19 +52,29 @@ Firebase Cloud Messaging API. Таким образом, необходимое 
 
 
 
-
-
-
-Firebase REST API
+Тестовое приложение Firebase 
 -------
+
+Предназначено для проверки функциональности, и как резервный вариант 
+для рассылки сообщений на случай недоступности golang приложения.
+
+- Подписка на сообщения <https://rg-push.firebaseapp.com/>.
+
+- Отправка сообщений <https://rg-push.firebaseapp.com/send.html>.
+Лучше открыть в другом браузере для чистоты эксперимента.
+
+
+
+message-sheduler GraphQL API
+------
 
 - `create_message( text, link, scheduled_time )` 
 - `update_message( id, text, link, scheduled_time )`
 - `delete_message( id, text, link, scheduled_time )`
 
 
-message-sheduler GraphQL API
-------
+Firebase REST API
+-------
 
 - `messages.json` - возвращает список сообщений
 - `counters.json` - возвращает значения счетчиков
@@ -77,6 +87,9 @@ message-sheduler GraphQL API
 Javascrit файл `public/js/topic-subscription.js`, должен быть подключен к HTML странице, для 
 подписки/отписки страницы на топики и если необходимо 
 для обработки поступающих уведомлений. 
+
+
+
 
 Минимальный пример использования
 ```html

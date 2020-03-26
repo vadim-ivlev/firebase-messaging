@@ -121,7 +121,7 @@ exports.onMessageWrite = functions.database.ref('/messages').onWrite((change, co
 
 // exports.scheduledFunction = functions.pubsub.schedule('every 5 minutes').onRun((context) => {
 
-exports.scheduledMessagesChecker = functions.pubsub.schedule('*/1 * * * *').onRun((context) => {
+exports.sendWaitingMessages = functions.pubsub.schedule('*/1 * * * *').onRun((context) => {
   console.log('------------------------------This will be run every  minute!')
   sendScheduledMessages()
   return null

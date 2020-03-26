@@ -9,7 +9,7 @@
 
 #### Development
 
-    firebase serve
+    firebase emulators:start
 
 #### Deploy
 
