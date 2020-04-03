@@ -85,7 +85,7 @@ exports.onMessageWrite = functions.database.ref('/messages').onWrite((change, co
         for (let key of Object.keys(newMessages)) if (!oldMessages[key]) return key
     }
     // -------------------------------------------------------
-    let email = ''
+    let email = 'aaa'
     try {
         email = context.auth.token.email
     } catch (error) { }
@@ -100,8 +100,9 @@ exports.onMessageWrite = functions.database.ref('/messages').onWrite((change, co
     console.log('newKey=', newKey)
     if (! newKey) return null
 
-    // удалим новое соощение  если пользователь неправильный
-    if (!['vadim.ivlev@gmail.com', 'maxchagin@gmail.com'].includes(email) ){
+
+    // удалим новое сообщение  если пользователь неправильный
+    if (!['vadim.ivlev@gmail.com', 'maxchagin@gmail.com','aaa'].includes(email) ){
         console.log(`User ${email} has no permitions`)
         return admin.database().ref('/messages').child(newKey).remove()
     }
