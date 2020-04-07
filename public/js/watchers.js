@@ -133,6 +133,7 @@ function showMessages(data) {
         tableRows += `
         <tr>
             <td><a href="${v['link']}" target="_blank">${v['message']}</a><br>${k}</td>
+            <td><img width="36" src="${v['icon']?v['icon']:''}" alt="icon"></td>
             <td>${v['user']}<br>${v['to']} </td>
             <td>${timeCreated}<br>${timeScheduled}</td>
             <td> 
@@ -156,6 +157,7 @@ function showMessages(data) {
         <thead>
             <tr>
                 <th>сообщение</th>
+                <th>икон</th>
                 <th>кто<br>кому</th>
                 <th>создано<br>запланировано</th>
                 <th>статус<br>послать через</th>

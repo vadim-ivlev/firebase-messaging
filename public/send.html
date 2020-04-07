@@ -18,32 +18,41 @@
     <div id="main-area" style="transition: background-color 200ms linear; background-color: whitesmoke; padding: 20px; max-width: 900px; margin:auto; display:none;">
 
         <h4>Cообщение</h4>
+
         <label for="txt">Текст сообщения</label>
         <input id="txt" type="text"  placeholder="текст сообщения" value="Верховный суд разъяснил, чем угон автомобиля отличается от кражи"/>
+
         <label for="link">Ссылка</label>
         <input id="link" type="text"  placeholder="ссылка" value="https://rg.ru/2020/03/02/verhovnyj-sud-raziasnil-chem-ugon-avtomobilia-otlichaetsia-ot-krazhi.html"/>
 
+        <label>URL иконки сообщения</label>
+        <input id="icon" type="text" value="https://cdnimg.rg.ru/res/images/logo/logo_rg_yn.png" placeholder="URL иконки сообщения" />
+
         <label>Токен пользователя или имя топика в виде '/topics/topicName'</label>
         <input id="to" type="text" value='/topics/rgru' placeholder="токен пользователя или /topics/topicName" />
+
         <div style="display: none;">
             <label>Статус сообщения.</label>
             <input id="status" type="text" value='scheduled' placeholder="Статус сообщения. 'scheduled' - для посылки через означенное время" style="width:200px;"/>
             <b>&nbsp;&nbsp;&nbsp; scheduled - для посылки через означенное время</b>
             <br>
             </div>
-        <b>Послать сообщение через </b>
+
+            <b>Послать сообщение через </b>
         <input id="wait" type="number" value="5" placeholder="Время до посылки сообщения в минутах" style="width: 100px; background-color: white;"/>
         <b> минут</b><br>
         <button onclick="createMessage(
             document.getElementById('to').value, 
             document.getElementById('txt').value, 
             document.getElementById('link').value, 
+            document.getElementById('icon').value, 
             0,
             document.getElementById('user-email').innerText)">Послать немедленно</button>
         <button onclick="createMessage(
             document.getElementById('to').value, 
             document.getElementById('txt').value, 
             document.getElementById('link').value, 
+            document.getElementById('icon').value, 
             document.getElementById('wait').value,
             document.getElementById('user-email').innerText)">Запланировать сообщение</button>
         <button onclick="sendScheduledMessages()" class="button-outline">Послать запланированные сообщения</button>
@@ -122,7 +131,7 @@
     <script src="/__/firebase/init.js"></script> 
 -->
 
-    <script src="js/db-secret.js"></script>
+    <!-- <script src="js/db-secret.js"></script> -->
     <script src="js/functions.js"></script>
     <script src="js/authorization.js"></script>
     <script src="js/watchers.js"></script>

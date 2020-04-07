@@ -84,7 +84,7 @@ exports.onMessageWrite = functions.database.ref('/messages').onWrite((change, co
     function getNewKey(oldMessages, newMessages) {
         for (let key of Object.keys(newMessages)) if (!oldMessages[key]) return key
     }
-    // -------------------------------------------------------
+    // Создаю вымышленный емейл из соображений безопасности.
     let email = 'aaa'
     try {
         email = context.auth.token.email
@@ -172,7 +172,7 @@ function sendScheduledMessages(){
                 if (v.status != 'scheduled') continue
                 if (Date.now() < v.scheduled_time) continue
                 console.log('k=',k)
-                await sendMessage(v.to, v.message, v.link)
+                await sendMessage(v.to, v.message, v.link, v.icon)
                 console.log(' ==== message sent')
                 await admin.database().ref('/messages').child(k).update({ 'status': 'sent'})
                 console.log(' ==== db updated')
@@ -240,16 +240,17 @@ function unsubscribe(tokenList, topicName) {
  * @param {*} to имя топика в виде /topics/topicName или токен пользователя
  * @param {*} message текст сообщения
  * @param {*} link ссылка сообщения
+ * @param {*} icon URL иконки
  * @see 
  */
-function sendMessage(to, message, link) {
+function sendMessage(to, message, link, icon) {
 
     console.log("SendMessage server ------------------------------------------------------------------------------")
 
     var notification = {
       'title': message,
       'body': message,
-      'icon': 'https://rg.ru/favicon.ico',
+      'icon': icon,
       'click_action': link
     };
     return fetch('https://fcm.googleapis.com/fcm/send', {

@@ -16,8 +16,8 @@ function unsubscribeTokenFromTopic(token, topic) {
 }
 
 
-function createMessage(to, message, link, wait, /*status,*/ user){
-    firebase.database().ref('/messages').push({to, message, link, wait, /*status,*/ user})
+function createMessage(to, message, link, icon, wait, /*status,*/ user){
+    firebase.database().ref('/messages').push({to, message, link, icon, wait, /*status,*/ user})
 }
 
 function deleteMessage(key){
