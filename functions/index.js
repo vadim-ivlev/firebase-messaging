@@ -17,6 +17,7 @@ const FCM_SERVER_KEY = require('./fcm-server-key-module')
  * Подписывает токен на топик rgru.
  * 
  * @param iid - Токен браузера подписчика. FCM Instanse Client Identifier. Token of users browser.
+ * @param topic - Имя топика.
  * @example http://localhost:5001/rg-push/us-central1/subscribe_token_to_topic?iid=12345
  */
 exports.subscribe_token_to_topic = functions.https.onRequest((request, response) => {  
@@ -51,6 +52,7 @@ exports.subscribe_token_to_topic = functions.https.onRequest((request, response)
  * Подписывает токен на топик rgru.
  * 
  * @param iid - Токен браузера подписчика. FCM Instanse Client Identifier. Token of users browser.
+ * @param topic - Имя топика.
  * @example http://localhost:5001/rg-push/us-central1/unsubscribe_token_from_topic?iid=12345
  */
 exports.unsubscribe_token_from_topic = functions.https.onRequest((request, response) => {  
@@ -79,7 +81,8 @@ exports.unsubscribe_token_from_topic = functions.https.onRequest((request, respo
 })
 
 
-
+// Триггер Firebase срабатывающий на изменение данных коллекции `messages`.
+// Добавляет поля status=scheduled, creation_time, scheduled_time к новым записям.
 exports.onMessageWrite = functions.database.ref('/messages').onWrite((change, context) => {
     function getNewKey(oldMessages, newMessages) {
         for (let key of Object.keys(newMessages)) if (!oldMessages[key]) return key
@@ -120,8 +123,10 @@ exports.onMessageWrite = functions.database.ref('/messages').onWrite((change, co
             })
 }) 
 
-// exports.scheduledFunction = functions.pubsub.schedule('every 5 minutes').onRun((context) => {
 
+/**
+ * Триггер Firebase каждую минуту отправляющий готовые к отправке сообщения.
+ */
 exports.sendWaitingMessages = functions.pubsub.schedule('*/1 * * * *').onRun((context) => {
   console.log('------------------------------This will be run every  minute!')
   sendScheduledMessages()
@@ -129,6 +134,11 @@ exports.sendWaitingMessages = functions.pubsub.schedule('*/1 * * * *').onRun((co
 });
 
 
+/**
+ * немедленно отправляет запланированные сообщения, время которых настало.
+ * пример использования:
+ * https://us-central1-rg-push.cloudfunctions.net/send_scheduled_messages
+ */
 exports.send_scheduled_messages = functions.https.onRequest((request, response) => {
     return cors(request, response, async () => {
 
@@ -144,24 +154,12 @@ exports.send_scheduled_messages = functions.https.onRequest((request, response) 
     })
 })
 
-// function sendScheduledMessages(){
-//     return admin.database().ref('/messages').once('value')
-//         .then(function (snapshot) {
-//             let messages = snapshot.val()
-//             for (let [k,v] of Object.entries(messages)){
-//                 if (v.status != 'scheduled') continue
-//                 if (Date.now() < v.scheduled_time) continue
-//                 console.log('k=',k)
-//             }
 
-//         })
-//         .catch(err => {
-//             console.error("---------------------------->messages error", err)
-//         })
-//         .finally(()=>{
-//             console.log("---------------------------->messages END")
-//         })
-// }
+// Функции фактически выполняющие работу------------------------------------------------------------------------------
+
+/**
+ * sendScheduledMessages немедленно отправляет запланированные сообщения, время которых настало.
+ */
 function sendScheduledMessages(){
     return admin.database().ref('/messages').once('value',
         async (snapshot) => {
@@ -189,8 +187,6 @@ function sendScheduledMessages(){
 }
 
 
-
-// Функции фактически выполняющие работу------------------------------------------------------------------------------
 
 
 /**

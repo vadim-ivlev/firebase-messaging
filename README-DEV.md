@@ -13,9 +13,14 @@
 
 #### Deploy
 
+    firebase deploy --only functions
+    firebase deploy --only hosting
     firebase deploy
 
-#### Получить значение токена https://rg.ru 
+
+### Получить значение токена https://rg.ru
+
+
 Открыть консоль браузера и ввести
 
     navigator.serviceWorker.ready
