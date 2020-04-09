@@ -1,16 +1,6 @@
-function _TopicSubscription(subscriptionTopic, onMessageCallback){
-
-    // var app = firebase.initializeApp({
-    //     apiKey: "AIzaSyB1Kb1oqVigcSoVTEb5An0tXgRRygSO6vE",
-    //     authDomain: "rg-push.firebaseapp.com",
-    //     databaseURL: "https://rg-push.firebaseio.com",
-    //     projectId: "rg-push",
-    //     storageBucket: "rg-push.appspot.com",
-    //     messagingSenderId: "666454432034",
-    //     appId: "1:666454432034:web:b2ddca1d2dd1fbbe4dad7b",
-    //     measurementId: "G-RGP6KVRXG5"
-    // },'rgruTopics')
-
+function _TopicSubscription(subscriptionTopic, onMessageCallback, onSubscribe, onUnsubscribe){
+    
+    // Параметры подсоединения к Firebase
     var firebaseConfig = {
         apiKey: "AIzaSyB1Kb1oqVigcSoVTEb5An0tXgRRygSO6vE",
         authDomain: "rg-push.firebaseapp.com",
@@ -21,12 +11,14 @@ function _TopicSubscription(subscriptionTopic, onMessageCallback){
         appId: "1:666454432034:web:b2ddca1d2dd1fbbe4dad7b",
         measurementId: "G-RGP6KVRXG5"
     }
+    // Для локальной разработки
     if (location.hostname === 'localhost'){
         console.log ("Using firebase emulator http://localhost:9000")
         firebaseConfig.databaseURL = "http://localhost:9000?ns=rg-push"
     }
-    var app = firebase.initializeApp(firebaseConfig,'rgruTopics')
 
+    // Инициализируем приложение Firebase
+    var app = firebase.initializeApp(firebaseConfig,'rgruTopics')
     const messaging = firebase.messaging(app)
     
     // Публичный ключ сгенерированный в консоли Firebase. 
@@ -40,12 +32,27 @@ function _TopicSubscription(subscriptionTopic, onMessageCallback){
     // Токен пользователя
     var IID_TOKEN = ''
 
+    // Префикс localStorage для хранения пар топик-токен
+    var LOCALSTORAGE_PREFIX = 'RG token subscribed to '
+
+
     // Адрес Интернет функций подписки/отписки
     var functionUrl = document.location.hostname == 'localhost' ? 'http://localhost:5001/rg-push/us-central1/' : ' https://us-central1-rg-push.cloudfunctions.net/';
 
+    /**
+     * Возвращает массив имен топиков на которые подписана страница
+     */
+    function getSubscribedTopics() {
+        var keys = Object.keys(localStorage)
+        var subscribedKeys = keys.filter(v => v.startsWith(LOCALSTORAGE_PREFIX))
+        var topics = subscribedKeys.map(v => v.replace(LOCALSTORAGE_PREFIX,''))
+        return topics        
+    }
+
 
     /**
-     *  Запрашивает у пользователя разрешение на получение нотификаций
+     * Запрашивает у пользователя разрешение на получение нотификаций
+     * Нв экране появляется запрос: согласен ли пользователь принимать сообщения?
      */
     function requestPermission() {
         return Notification.requestPermission().then(permission => {
@@ -58,84 +65,129 @@ function _TopicSubscription(subscriptionTopic, onMessageCallback){
     }
 
 
+    /**
+     * Подписывает токен на пролучение сообщение по данному топику.
+     * Параметры должны быть в URLencoded виде, что можно не делать если название топика
+     * состоит из разрешенных символов (букв и цифр). Токен не нуждается в этом преобразовании.
+     * @param {string} token - Токен пользователя
+     * @param {string} topic - Название топика
+     * @returns - Promise
+     */
     function subscribeTokenToTopic(token, topic) {
         if (!token) return
         return fetch( `${functionUrl}subscribe_token_to_topic?iid=${token}&topic=${topic}`)
             .then(res => res.json())
-            .then(json => console.log(json))
+            .then(json => {
+                console.log(json)
+                localStorage.setItem(LOCALSTORAGE_PREFIX + topic, token)
+                if (typeof onSubscribe == 'function') onSubscribe(topic, token)
+            })
             .catch(err => console.log("ERROR:",err))
     }
-    
+
+
+    /**
+     * Подписывает токен на пролучение сообщение по данному топику.
+     * Параметры должны быть в URLencoded виде, что можно не делать если название топика
+     * состоит из разрешенных символов (букв и цифр). Токен не нуждается в этом преобразовании.
+     * @param {string} token - Токен пользователя
+     * @param {string} topic - Название топика
+     * @returns - Promise
+     */    
     function unsubscribeTokenFromTopic(token, topic) {
         if (!token) return
         return fetch(`${functionUrl}unsubscribe_token_from_topic?iid=${token}&topic=${topic}`)
             .then(res => res.json())
-            .then(json => console.log(json))
+            .then(json => {
+                console.log(json)
+                localStorage.removeItem(LOCALSTORAGE_PREFIX + topic)
+                if (typeof onUnsubscribe == 'function') onUnsubscribe(topic, token)
+            })
             .catch(err => console.log("ERROR:",err))
     }
 
-    // Проверить не выслан ли уже 
-    // и послать Instance ID token на сервер, для того чтобы:
-    // - можно было посылать сообщения этому приложению
-    // - подписать токен на прием сообщений по какой то теме/топику
-    async function checkAndSubscribeTokenToRGRU(currentToken) {
+
+    /**
+     * Проверить не зарегистрирован ли токен (Instance ID ) уже, и если нет
+     * послать его  на сервер чтобы:
+     * - можно было посылать сообщения этому приложению
+     * - подписать токен на прием сообщений по какой то теме/топику
+     * @param {*} currentToken 
+     */
+    async function checkAndSubscribeToken(currentToken) {
         if (!currentToken) return
-        var keyPrefix = 'RG token subscribed to '
         // Если токен уже был выслан второй раз он не посылается
-        if (localStorage.getItem(keyPrefix + 'rgru') == currentToken)
+        if (localStorage.getItem(LOCALSTORAGE_PREFIX + TOPIC) == currentToken)
         {
-            console.log('Token has already been subscribed.')
+            console.log('Token has already been subscribed to topic '+TOPIC)
             return
         }
 
-        console.log("Subscribing token to RGRU...")
+        console.log("Subscribing token to "+TOPIC)
         await subscribeTokenToTopic(currentToken, TOPIC)
-        localStorage.setItem(keyPrefix + 'rgru', currentToken)
-        console.log('Token is subscribed to RGRU')
+        console.log('Token is subscribed to '+TOPIC)
+    }
+
+
+    // Get Instance ID token. Initially this makes a network call, once retrieved
+    // subsequent calls to getCurrentToken will return from cache.
+    async function getTokenAndSubscribeItToTopic() {
+        try {
+            await getNewToken()
+            checkAndSubscribeToken(IID_TOKEN)
+        } catch (err) {
+            console.log("An error occurred while retrieving token. ", err)
+        }
     }
 
     // Get Instance ID token. Initially this makes a network call, once retrieved
     // subsequent calls to getCurrentToken will return from cache.
-    function getTokenAndSubscribeItToTopic() {
-        // console.log("getCurrentToken")
-        IID_TOKEN = ''
-        messaging.getToken().then(currentToken => {
-                if (currentToken) {
-                    console.log("currentToken=", currentToken)
-                    IID_TOKEN = currentToken
-                    checkAndSubscribeTokenToRGRU(IID_TOKEN)
-                } else {
-                    console.log("No Instance ID token available. Request permission to generate one.")
-                }
-            })
-            .catch(err => {
-                console.log("An error occurred while retrieving token. ", err)
-            })
+    async function getNewToken() {
+        try {
+            let currentToken = await messaging.getToken()
+            if (currentToken) {
+                console.log("currentToken=", currentToken)
+                IID_TOKEN = currentToken
+                return currentToken
+            } else {
+                console.log("No Instance ID token available. Request permission to generate one.")
+            }
+        } catch (err) {
+            console.log("An error occurred while retrieving token. ", err)
+        }
     }
+
+
+
     
     async function deleteToken() {
         console.log("deleteToken")
-        await unsubscribeTokenFromTopic(IID_TOKEN, TOPIC)
-        console.log('unsubscribed before deleting')
-        messaging.deleteToken(IID_TOKEN)
-            .then(() => {
-                IID_TOKEN = ''
-                console.log("Token deleted.")
-            })
-            .catch(err => {
-                console.log("Unable to delete token. ", err)
-            })
+        try {
+            await unsubscribeTokenFromTopic(IID_TOKEN, TOPIC)
+            console.log('unsubscribed before deleting')
+            await messaging.deleteToken(IID_TOKEN)
+            IID_TOKEN = ''
+            console.log("Token deleted.")
+        } catch (err) {
+            console.log("Unable to delete token. ", err)
+        }
     }
 
-    // Обработчик входящих сообщений. Вызывается когда:
-    // - сообщение приходит когда приложение имеет фокус
-    // - the user clicks on an app notification created by a service worker
-    //   `messaging.setBackgroundMessageHandler` handler.
+    /**
+     * Обработчик входящих сообщений. Вызывается когда:
+     * - сообщение приходит когда приложение имеет фокус
+     * - the user clicks on an app notification created by a service worker
+     *   `messaging.setBackgroundMessageHandler` handler.
+     * @param {*} callback 
+     */
     function setOnMessageCallback(callback){   
         messaging.onMessage(callback)        
     }
 
-    // Callback fired if Instance ID token is updated.
+    /**
+     * Согласно документации, срабатывает если Instance ID токен был обновлен.
+     * Я не наблюдал этого события ни разу. (Ивлев)
+     */
     messaging.onTokenRefresh(() => {
         console.log("onTokenRefresh")
         getTokenAndSubscribeItToTopic()
@@ -160,9 +212,11 @@ function _TopicSubscription(subscriptionTopic, onMessageCallback){
         deleteToken,
         subscribeTokenToTopic,
         unsubscribeTokenFromTopic,
-        checkAndSubscribeTokenToRGRU,
+        checkAndSubscribeToken,
         getTokenAndSubscribeItToTopic,
         setOnMessageCallback,
+        getSubscribedTopics,
+        getNewToken,
     }
 }
 

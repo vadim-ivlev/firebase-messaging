@@ -255,9 +255,11 @@ messages: {
         deleteToken,
         subscribeTokenToTopic,
         unsubscribeTokenFromTopic,
-        checkAndSubscribeTokenToRGRU,
+        checkAndSubscribeToken,
         getTokenAndSubscribeItToTopic,
         setOnMessageCallback,
+        getSubscribedTopics,
+        getNewToken,
     }
 ```
 
@@ -266,3 +268,47 @@ Worker
 Файл `public/firebase-messaging-sw.js` определяет web-worker для приема сообщений и должен находиться в корневой директории ( в той же,что и HTML страница 
 подписки ?). `firebase-messaging-sw.js` не обязан упоминаться нигде на клиентской HTML 
 странице. 
+
+------------------------------------------------------------------------
+<br>
+<br>
+<br>
+Установка проекта на локальный компьютер и разработка
+------------------------
+
+Убедитесь, что на компьютере установлены nodejs и npm.
+
+Установите средства разработки Firebase
+
+    npm install -g firebase-tools@lates firebase-admin@latest
+    firebase login
+
+После клонирования проекта, из директории проекта
+перейдите в директорию `functions/` и установите npm модули. 
+
+    cd functions
+    npm i
+
+
+**Разработка**
+
+Для запуска эмуляторов Firebase выполните  команду 
+
+    firebase emulators:start
+
+Читайте сообщения, где будут указаны адреса доступа страниц и функций.
+Например:
+
+    ...
+    hosting: hosting emulator started at http://localhost:5000
+    ...
+
+**Деплой**
+
+Следующие команды деплоят функции, хостин, и все вместе соответственно
+
+    firebase deploy --only functions
+    firebase deploy --only hosting
+    firebase deploy
+
+Если вы работаете под Linux или Mac можно воспользоваться скриптами в директории `sh/`.

@@ -1,21 +1,3 @@
-#### setup
-
-    npm install -g firebase-tools@lates firebase-admin@latest
-    firebase login
-
-    cd functions
-    npm i
-
-
-#### Development
-
-    firebase emulators:start
-
-#### Deploy
-
-    firebase deploy --only functions
-    firebase deploy --only hosting
-    firebase deploy
 
 
 ### Получить значение токена https://rg.ru

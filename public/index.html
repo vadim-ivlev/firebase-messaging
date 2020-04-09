@@ -18,6 +18,10 @@
 
     <b>Тестирование подписки на push уведомления Firebase Cloud Messaging.</b>  
     
+    <p>Эта страница подписана на следующие топики:
+    <pre id="subscribed-topics"></pre> 
+    Если вы подписали или отписали страницу на топик или удалили токен обновите страницу для обновления списка топиков.
+    </p>
     <p>
         <br>
         На этой странице ничего особенно делать не нужно если вы согласились на прием пуш уведомлений 
@@ -66,8 +70,9 @@
 
         
         2. Получить токен браузера. <br><br>
-        <button onclick="document.querySelector('#token').value = SUBSCRIPTION_TO_RGRU.getCurrentToken()">Показать токен</button>
-        <button onclick="SUBSCRIPTION_TO_RGRU.deleteToken()" class="button-outline">Удалить токен</button>   
+        <button onclick="SUBSCRIPTION_TO_RGRU.deleteToken().then(showToken)" class="button-outline">Удалить токен</button>   
+        <button onclick="SUBSCRIPTION_TO_RGRU.getNewToken().then(showToken)" class="button-outline">Получить новый токен</button>   
+        <button onclick="showToken()">Показать токен</button>
         <div style="display:grid; grid-template-columns: 1fr auto;" >
             <input id="token" type="text"  style="border-radius: 4px 0 0 4px;" />    
             <button class="button button-outline far fa-copy" style="border-radius: 0 4px 4px 0;" 
@@ -104,7 +109,17 @@
             const dataElement = document.createElement("pre")
             dataElement.textContent = JSON.stringify(payload, null, 2)
             document.querySelector("#messages").appendChild(dataElement)
-        })
+        }, showTopics, showTopics)
+
+        function showTopics() {
+            document.getElementById('subscribed-topics').innerText = SUBSCRIPTION_TO_RGRU.getSubscribedTopics()
+        }
+
+        function showToken() {
+            document.querySelector('#token').value = SUBSCRIPTION_TO_RGRU.getCurrentToken()
+        }
+
+        showTopics()
 
         // var SUBSCRIPTION_TO_RGRU = _TopicSubscription('rgru')
 

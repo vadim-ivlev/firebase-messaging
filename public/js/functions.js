@@ -31,6 +31,7 @@ async function editMessage(key){
     document.getElementById('to').value = msg.to 
     document.getElementById('txt').value = msg.message
     document.getElementById('link').value = msg.link
+    document.getElementById('icon').value = msg.icon
     document.getElementById('wait').value = msg.wait
     console.log(msg)
     window.scrollTo(0,0)
