@@ -16,7 +16,7 @@ firebase-messaging
 - https://git.rgwork.ru/ivlev/firebase-messaging
 - https://git.rgwork.ru/ivlev/message-admin
 
-
+За более подробными сведениями  обращайтесь к README конкретного репозитория. 
 
 Предпосылки
 -----
@@ -242,25 +242,61 @@ messages: {
 
 
 В файле `topic-subscription.js` определена единственная функция
-`_TopicSubscription( topicName, onMessageCallback)`, которая может быть вызвана в любой момент, предположительно после загрузки страницы.
+`_TopicSubscription`, которая может быть вызвана в любой момент, предположительно после загрузки страницы.
+
+```javascript
+**
+ * _TopicSubscription Задает параметры подписки на топик.
+ * Может быть вызвана в любой момент цикла загрузки страницы.
+ * 
+ * @param {*} subscriptionTopic - имя топика подписки
+ * Функции обратного вызова
+ * @param {*} onMessageCallback(message) - срабатывает когда получено новое сообщение и закладка страницы является верхней в окне браузера.
+ * @param {*} onSubscribe(topic, token) - срабатывает когда токен подписан на топик.
+ * @param {*} onUnsubscribe(topic, token) - срабатывает когда токен отписан от топика.
+ */
+function _TopicSubscription(subscriptionTopic, onMessageCallback, onSubscribe, onUnsubscribe)
+
+
+```
+
+
+
+
+
 Функция возвращает объект со следующими функциями:
 
 ```javascript
 
     return {
+        //Функция возвращает текущий топик
         getTopic: () => TOPIC,
+        // Функция устанавливает текущий топик
         setTopic: (topic) => TOPIC=topic, 
+        // Запрашивает у пользователя разрешение на получение нотификаций
         requestPermission,
+        // Возвращает текущий токен
         getCurrentToken: () => IID_TOKEN,
-        deleteToken,
+        // Подписывает токен на топик
         subscribeTokenToTopic,
+        // Отписывает токен от топика
         unsubscribeTokenFromTopic,
+        // Подписывает данный токен на топик если он не был подписан 
         checkAndSubscribeToken,
+        // Получает токен и подписывает его на топик, если он не был подписан ранее
         getTokenAndSubscribeItToTopic,
+        
+        // Устанавливает обработчик события на получение нового сообщения
         setOnMessageCallback,
+        // Возвращает список топиков на которые подписана текущий токен
         getSubscribedTopics,
+        
+        // Удаляет текущий токен 
+        deleteToken,
+        // Получает новый токен, если старый был удален
         getNewToken,
     }
+
 ```
 
 Worker
